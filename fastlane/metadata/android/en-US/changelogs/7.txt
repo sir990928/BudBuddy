@@ -1,1 +1,3 @@
 ✨ v1.4.1
+- Improve media metadata extraction and genre fetching
+- Fixed notification translation errors
