@@ -97,6 +97,68 @@ fun AppSettingsScreen(
         }
     }
 
+    val isFromPlayStore = remember(context) {
+        try {
+            val installer = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                context.packageManager.getInstallSourceInfo(context.packageName).installingPackageName
+            } else {
+                @Suppress("DEPRECATION")
+                context.packageManager.getInstallerPackageName(context.packageName)
+            }
+            installer == "com.android.vending"
+        } catch (e: Exception) {
+            false
+        }
+    }
+    
+    val versionCode = remember(context) {
+        try {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                context.packageManager.getPackageInfo(context.packageName, 0).longVersionCode
+            } else {
+                @Suppress("DEPRECATION")
+                context.packageManager.getPackageInfo(context.packageName, 0).versionCode.toLong()
+            }
+        } catch (e: Exception) {
+            0L
+        }
+    }
+    
+    var changelogText by remember { mutableStateOf<String?>(null) }
+    var isChangelogExpanded by remember { mutableStateOf(false) }
+
+    LaunchedEffect(isFromPlayStore, versionCode) {
+        if (!isFromPlayStore) {
+            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                try {
+                    val lang = java.util.Locale.getDefault().language
+                    val folderName = when (lang) {
+                        "tr" -> "tr-TR"
+                        "az" -> "az-AZ"
+                        else -> "en-US"
+                    }
+                    var url = java.net.URL("https://raw.githubusercontent.com/BenEgeDeniz/BudBuddy/refs/heads/master/fastlane/metadata/android/$folderName/changelogs/$versionCode.txt")
+                    var connection = url.openConnection() as java.net.HttpURLConnection
+                    connection.connectTimeout = 3000
+                    connection.readTimeout = 3000
+                    
+                    if (connection.responseCode != 200) {
+                        url = java.net.URL("https://raw.githubusercontent.com/BenEgeDeniz/BudBuddy/refs/heads/master/fastlane/metadata/android/en-US/changelogs/$versionCode.txt")
+                        connection = url.openConnection() as java.net.HttpURLConnection
+                        connection.connectTimeout = 3000
+                        connection.readTimeout = 3000
+                    }
+                    
+                    if (connection.responseCode == 200) {
+                        changelogText = connection.inputStream.bufferedReader().use { it.readText() }.trim()
+                    }
+                } catch (e: Exception) {
+                    // Ignore
+                }
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
             PageHeader(
@@ -130,7 +192,7 @@ fun AppSettingsScreen(
                 Card(
                     shape = RoundedCornerShape(24.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer
+                        containerColor = MaterialTheme.colorScheme.primaryContainer
                     ),
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -145,13 +207,13 @@ fun AppSettingsScreen(
                             Box(
                                 modifier = Modifier
                                     .size(32.dp)
-                                    .background(ErrorRed, CircleShape),
+                                    .background(MaterialTheme.colorScheme.primary, CircleShape),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.PriorityHigh,
                                     contentDescription = null,
-                                    tint = Color.White,
+                                    tint = MaterialTheme.colorScheme.onPrimary,
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -160,12 +222,12 @@ fun AppSettingsScreen(
                                     text = stringResource(R.string.update_available),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onErrorContainer
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
                                 Text(
                                     text = stringResource(R.string.update_available_desc, available.latestVersion),
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.85f)
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f)
                                 )
                             }
                         }
@@ -176,8 +238,8 @@ fun AppSettingsScreen(
                                 uriHandler.openUri(available.downloadUrl)
                             },
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = ErrorRed,
-                                contentColor = Color.White
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
                             ),
                             shape = RoundedCornerShape(14.dp),
                             modifier = Modifier
@@ -391,29 +453,53 @@ fun AppSettingsScreen(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
 
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .clickable {
-                                        uriHandler.openUri("https://benegedeniz.com")
-                                    }
-                                    .padding(vertical = 4.dp)
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.https_benegedeniz_com),
-                                    style = MaterialTheme.typography.bodyMedium.copy(textDecoration = TextDecoration.Underline),
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.OpenInNew,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                            }
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .clickable {
+                                            uriHandler.openUri("https://benegedeniz.com")
+                                        }
+                                        .padding(vertical = 4.dp)
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.https_benegedeniz_com),
+                                        style = MaterialTheme.typography.bodyMedium.copy(textDecoration = TextDecoration.Underline),
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.OpenInNew,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                }
+                                
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .clickable {
+                                            uriHandler.openUri("https://github.com/BenEgeDeniz/BudBuddy")
+                                        }
+                                        .padding(vertical = 4.dp)
+                                ) {
+                                    Text(
+                                        text = "Source Code (GitHub)",
+                                        style = MaterialTheme.typography.bodyMedium.copy(textDecoration = TextDecoration.Underline),
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.OpenInNew,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                }
 
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -506,100 +592,139 @@ fun AppSettingsScreen(
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                             )
-                        }
+                         }
                     }
 
-                    HorizontalDivider(
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.15f)
-                    )
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        when (val status = updateStatus) {
-                            is UpdateChecker.UpdateStatus.Checking -> {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(16.dp),
-                                        strokeWidth = 2.dp,
+                    if (!isFromPlayStore) {
+                        HorizontalDivider(
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.15f)
+                        )
+                        
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            when (val status = updateStatus) {
+                                is UpdateChecker.UpdateStatus.Checking -> {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(16.dp),
+                                            strokeWidth = 2.dp,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                        Text(
+                                            text = stringResource(R.string.checking_for_updates),
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+                                is UpdateChecker.UpdateStatus.UpToDate -> {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Check,
+                                            contentDescription = null,
+                                            tint = StatusActiveGreen,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                        Text(
+                                            text = stringResource(R.string.app_is_up_to_date),
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = StatusActiveGreen
+                                        )
+                                    }
+                                }
+                                is UpdateChecker.UpdateStatus.Available -> {
+                                    Text(
+                                        text = "v${status.latestVersion} ${stringResource(R.string.update_available)}",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.primary
                                     )
-                                    Text(
-                                        text = stringResource(R.string.checking_for_updates),
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
+                                }
+                                else -> {
+                                    TextButton(
+                                        onClick = {
+                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                            UpdateChecker.checkForUpdates(versionName, coroutineScope)
+                                        },
+                                        contentPadding = PaddingValues(0.dp)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Refresh,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Text(
+                                            text = stringResource(R.string.check_for_updates),
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                    }
                                 }
                             }
-                            is UpdateChecker.UpdateStatus.UpToDate -> {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Check,
-                                        contentDescription = null,
-                                        tint = StatusActiveGreen,
-                                        modifier = Modifier.size(18.dp)
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.app_is_up_to_date),
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = StatusActiveGreen
-                                    )
-                                }
-                            }
-                            is UpdateChecker.UpdateStatus.Available -> {
-                                Text(
-                                    text = "v${status.latestVersion} ${stringResource(R.string.update_available)}",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = ErrorRed
-                                )
-                            }
-                            else -> {
+
+                            if (updateStatus is UpdateChecker.UpdateStatus.UpToDate || updateStatus is UpdateChecker.UpdateStatus.Error) {
                                 TextButton(
                                     onClick = {
                                         haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                         UpdateChecker.checkForUpdates(versionName, coroutineScope)
-                                    },
-                                    contentPadding = PaddingValues(0.dp)
+                                    }
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Refresh,
                                         contentDescription = null,
                                         modifier = Modifier.size(16.dp)
                                     )
-                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Spacer(modifier = Modifier.width(4.dp))
                                     Text(
                                         text = stringResource(R.string.check_for_updates),
-                                        style = MaterialTheme.typography.bodyMedium
+                                        style = MaterialTheme.typography.labelMedium
                                     )
                                 }
                             }
                         }
-
-                        if (updateStatus is UpdateChecker.UpdateStatus.UpToDate || updateStatus is UpdateChecker.UpdateStatus.Error) {
-                            TextButton(
-                                onClick = {
-                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                    UpdateChecker.checkForUpdates(versionName, coroutineScope)
-                                }
+                    }
+                    
+                    if (!isFromPlayStore && !changelogText.isNullOrEmpty()) {
+                        HorizontalDivider(
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.15f)
+                        )
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { isChangelogExpanded = !isChangelogExpanded }
+                                .padding(vertical = 12.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
+                                Text(stringResource(R.string.changelog), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
                                 Icon(
-                                    imageVector = Icons.Default.Refresh,
+                                    imageVector = if (isChangelogExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                                     contentDescription = null,
-                                    modifier = Modifier.size(16.dp)
+                                    modifier = Modifier.size(20.dp)
                                 )
-                                Spacer(modifier = Modifier.width(4.dp))
+                            }
+                            AnimatedVisibility(
+                                visible = isChangelogExpanded,
+                                enter = fadeIn() + expandVertically(),
+                                exit = fadeOut() + shrinkVertically()
+                            ) {
                                 Text(
-                                    text = stringResource(R.string.check_for_updates),
-                                    style = MaterialTheme.typography.bodyMedium
+                                    text = changelogText!!,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(top = 8.dp)
                                 )
                             }
                         }

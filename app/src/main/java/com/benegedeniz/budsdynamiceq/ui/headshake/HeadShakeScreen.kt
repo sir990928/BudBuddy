@@ -792,7 +792,11 @@ fun LivePreviewSection(
                 )
             }
             
-            androidx.compose.animation.AnimatedVisibility(visible = debugExpanded) {
+            androidx.compose.animation.AnimatedVisibility(
+                visible = debugExpanded,
+                enter = androidx.compose.animation.fadeIn() + androidx.compose.animation.expandVertically(),
+                exit = androidx.compose.animation.fadeOut() + androidx.compose.animation.shrinkVertically()
+            ) {
                 Column(modifier = Modifier.padding(top = 8.dp)) {
             Text(
                 text = stringResource(R.string.headshake_active_sensor, activeImuSide.name),

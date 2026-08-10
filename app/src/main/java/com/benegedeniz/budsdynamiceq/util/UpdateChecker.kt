@@ -45,7 +45,7 @@ object UpdateChecker {
                     val rawText = connection.inputStream.bufferedReader().use { it.readText() }.trim()
                     if (rawText.isNotEmpty() && isVersionLower(currentVersion, rawText)) {
                         _isUpdateAvailable.value = true
-                        _updateStatus.value = UpdateStatus.Available(rawText, RELEASES_URL)
+                        _updateStatus.value = UpdateStatus.Available(rawText, "$RELEASES_URL/tag/v$rawText")
                     } else {
                         _isUpdateAvailable.value = false
                         _updateStatus.value = UpdateStatus.UpToDate

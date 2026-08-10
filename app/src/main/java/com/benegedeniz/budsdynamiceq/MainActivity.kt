@@ -66,7 +66,20 @@ class MainActivity : ComponentActivity() {
                     } catch (e: Exception) {
                         "N/A"
                     }
-                    UpdateChecker.checkForUpdates(versionName, appCoroutineScope)
+                    val isFromPlayStore = try {
+                        val installer = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                            appContext.packageManager.getInstallSourceInfo(appContext.packageName).installingPackageName
+                        } else {
+                            @Suppress("DEPRECATION")
+                            appContext.packageManager.getInstallerPackageName(appContext.packageName)
+                        }
+                        installer == "com.android.vending"
+                    } catch (e: Exception) {
+                        false
+                    }
+                    if (!isFromPlayStore) {
+                        UpdateChecker.checkForUpdates(versionName, appCoroutineScope)
+                    }
                 }
                 
                 val navBarBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()

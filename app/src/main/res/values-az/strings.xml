@@ -409,7 +409,7 @@
 	<string name="checking_for_updates">Yeniləmələr yoxlanılır...</string>
 	<string name="update_available">Yeniləmə Mövcuddur!</string>
 	<string name="update_available_desc">Yeni versiya (%1$s) GitHub\'da mövcuddur.</string>
-	<string name="download_update">APK\'nı Yüklə</string>
+	<string name="download_update">GitHub-dan Yüklə</string>
 	<string name="app_is_up_to_date">Tətbiq günceldir</string>
 	<string name="wearstate_edit_flow">Axını Redaktə Et: %1$s</string>
 	<string name="wearstate_unnamed_action">Adsız Əməliyyat</string>
@@ -503,4 +503,5 @@
 	<string name="search_app_wide">Axtarın...</string>
     <string name="start_typing_to_search">Axtarış üçün yazmağa başlayın...</string>
     <string name="no_results_found">Nəticə tapılmadı.</string>
+    <string name="changelog">Dəyişikliklər</string>
 </resources>
