@@ -187,7 +187,7 @@ fun MainScreen() {
             val showBottomBar = !isSensorDebugScreenOpen && activeSubScreen == SubScreen.NONE
             AnimatedVisibility(
                 visible = showBottomBar,
-                modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth(),
+                modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth().windowInsetsPadding(WindowInsets.navigationBars),
                 enter = slideInVertically(initialOffsetY = { it }),
                 exit = slideOutVertically(targetOffsetY = { it })
             ) {
@@ -354,7 +354,7 @@ fun GlassyBottomNavBar(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 24.dp)
+            .padding(bottom = 12.dp)
             .height(64.dp)
     ) {
         Layout(

@@ -76,10 +76,12 @@ fun GestureEditScreen(
             modifier = Modifier.fillMaxSize(),
             containerColor = MaterialTheme.colorScheme.background,
             bottomBar = {
+                val navBarBottom = com.benegedeniz.budsdynamiceq.LocalGlobalNavBarBottom.current
+                val bottomPadding = maxOf(56.dp, navBarBottom + 24.dp)
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 56.dp),
+                        .padding(bottom = bottomPadding),
                     contentAlignment = Alignment.Center
                 ) {
                     val configuration = androidx.compose.ui.platform.LocalConfiguration.current

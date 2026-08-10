@@ -204,45 +204,53 @@ fun BudsScreen(
         }
     }
 
+    val animatedOverscroll by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = overscrollAmount,
+        animationSpec = androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow),
+        label = "overscrollAnimation"
+    )
+
     Box(
         modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
     ) {
+        val searchThreshold = 250f
+        val isReadyToSearch = overscrollAmount > searchThreshold
+        val rotation by androidx.compose.animation.core.animateFloatAsState(targetValue = if (isReadyToSearch) 180f else 0f)
+        val searchHintAlpha = (overscrollAmount / 150f).coerceIn(0f, 1f)
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 150.dp)
+                .graphicsLayer { alpha = searchHintAlpha },
+            contentAlignment = Alignment.Center
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.ArrowDownward,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(16.dp).graphicsLayer { rotationZ = rotation }
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = if (isReadyToSearch) stringResource(R.string.release_to_search_app_wide) else stringResource(R.string.pull_down_to_search),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
         LazyColumn(
             state = listState,
             modifier = Modifier
                 .fillMaxSize()
-                .nestedScroll(nestedScrollConnection),
+                .nestedScroll(nestedScrollConnection)
+                .graphicsLayer {
+                    translationY = animatedOverscroll * 0.5f
+                },
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 140.dp, bottom = 120.dp)
         ) {
-            // Pull down hint
-            item {
-                val searchThreshold = 250f
-                val isReadyToSearch = overscrollAmount > searchThreshold
-                
-                val rotation by androidx.compose.animation.core.animateFloatAsState(targetValue = if (isReadyToSearch) 180f else 0f)
-                
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowDownward,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(16.dp).graphicsLayer { rotationZ = rotation }
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = if (isReadyToSearch) stringResource(R.string.release_to_search_app_wide) else stringResource(R.string.pull_down_to_search),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
             // Status Section
             item {
                 val isNotificationGranted = remember(context) {

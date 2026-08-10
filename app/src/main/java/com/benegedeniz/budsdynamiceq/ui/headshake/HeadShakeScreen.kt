@@ -147,26 +147,26 @@ fun HeadShakeScreen(
                 }
             }
 
-            Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-                LazyColumn(
-                    state = listState,
-                    modifier = Modifier.fillMaxSize().nestedScroll(nestedScrollConnection),
-                    contentPadding = PaddingValues(bottom = 120.dp, top = 140.dp)
-                ) {
+            val animatedOverscroll by androidx.compose.animation.core.animateFloatAsState(
+                targetValue = overscrollAmount,
+                animationSpec = androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow),
+                label = "overscrollAnimation"
+            )
 
-                item {
-                    val searchThreshold = 250f
-                    val isReadyToSearch = overscrollAmount > searchThreshold
-                    
-                    val rotation by androidx.compose.animation.core.animateFloatAsState(targetValue = if (isReadyToSearch) 180f else 0f)
-                    
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+            Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+                val searchThreshold = 250f
+                val isReadyToSearch = overscrollAmount > searchThreshold
+                val rotation by androidx.compose.animation.core.animateFloatAsState(targetValue = if (isReadyToSearch) 180f else 0f)
+                val searchHintAlpha = (overscrollAmount / 150f).coerceIn(0f, 1f)
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 150.dp)
+                        .graphicsLayer { alpha = searchHintAlpha },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Default.ArrowDownward,
                             contentDescription = null,
@@ -181,6 +181,12 @@ fun HeadShakeScreen(
                         )
                     }
                 }
+
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier.fillMaxSize().nestedScroll(nestedScrollConnection).graphicsLayer { translationY = animatedOverscroll * 0.5f },
+                    contentPadding = PaddingValues(bottom = 120.dp, top = 140.dp)
+                ) {
 
                 item {
                     GesturesStatusCard(
