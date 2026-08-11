@@ -8,11 +8,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import com.benegedeniz.budsdynamiceq.ui.main.MainScreen
 import com.benegedeniz.budsdynamiceq.ui.setup.AppIntroScreen
 import com.benegedeniz.budsdynamiceq.ui.setup.SetupScreen
@@ -20,6 +25,8 @@ import com.benegedeniz.budsdynamiceq.ui.theme.BudsDynamicEQTheme
 import com.benegedeniz.budsdynamiceq.util.PermissionManager
 import com.benegedeniz.budsdynamiceq.util.UpdateChecker
 import kotlinx.coroutines.launch
+
+val LocalGlobalNavBarBottom = compositionLocalOf { 0.dp }
 
 class MainActivity : ComponentActivity() {
 
@@ -59,13 +66,28 @@ class MainActivity : ComponentActivity() {
                     } catch (e: Exception) {
                         "N/A"
                     }
-                    UpdateChecker.checkForUpdates(versionName, appCoroutineScope)
+                    val isFromPlayStore = try {
+                        val installer = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                            appContext.packageManager.getInstallSourceInfo(appContext.packageName).installingPackageName
+                        } else {
+                            @Suppress("DEPRECATION")
+                            appContext.packageManager.getInstallerPackageName(appContext.packageName)
+                        }
+                        installer == "com.android.vending"
+                    } catch (e: Exception) {
+                        false
+                    }
+                    if (!isFromPlayStore) {
+                        UpdateChecker.checkForUpdates(versionName, appCoroutineScope)
+                    }
                 }
                 
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
+                val navBarBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+                CompositionLocalProvider(LocalGlobalNavBarBottom provides navBarBottom) {
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
                     if (permissionsGranted) {
                         if (!hasSeenAppIntro) {
                             AppIntroScreen(
@@ -83,6 +105,7 @@ class MainActivity : ComponentActivity() {
                                 permissionsGranted = true
                             }
                         )
+                        }
                     }
                 }
             }

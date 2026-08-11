@@ -1,0 +1,6 @@
+✨ v1.4.1
+- Fixed notification translation issues
+- Improved update feature
+- Fixed system navigation bar handling
+- UI fixes and improvements.
+- Improved metadata and genre fetching

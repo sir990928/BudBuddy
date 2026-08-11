@@ -110,7 +110,8 @@ fun GestureRecordingScreen(viewModel: HeadShakeViewModel) {
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            Column(modifier = Modifier.fillMaxSize().navigationBarsPadding().imePadding()) {
+            val navBarBottom = com.benegedeniz.budsdynamiceq.LocalGlobalNavBarBottom.current
+            Column(modifier = Modifier.fillMaxSize().padding(bottom = navBarBottom).imePadding()) {
                 // App bar
                 CenterAlignedTopAppBar(
                     title = { 

@@ -181,8 +181,19 @@ class MediaObserver(private val context: Context) {
     }
 
     private fun updateTitleFromMetadata(metadata: MediaMetadata?) {
-        val title = metadata?.getString(MediaMetadata.METADATA_KEY_TITLE)
-        val artist = metadata?.getString(MediaMetadata.METADATA_KEY_ARTIST)
+        var title = metadata?.getString(MediaMetadata.METADATA_KEY_TITLE)
+        if (title.isNullOrBlank()) {
+            title = metadata?.getString(MediaMetadata.METADATA_KEY_DISPLAY_TITLE)
+        }
+        
+        var artist = metadata?.getString(MediaMetadata.METADATA_KEY_ARTIST)
+        if (artist.isNullOrBlank()) {
+            artist = metadata?.getString(MediaMetadata.METADATA_KEY_ALBUM_ARTIST)
+        }
+        if (artist.isNullOrBlank()) {
+            artist = metadata?.getString(MediaMetadata.METADATA_KEY_DISPLAY_SUBTITLE)
+        }
+        
         val genre = metadata?.getString(MediaMetadata.METADATA_KEY_GENRE)
         
         handleNewMetadata(title, artist, genre)
@@ -237,7 +248,7 @@ class MediaObserver(private val context: Context) {
 
         if (initialState == GenreFetchState.LOADING && !title.isNullOrBlank() && !artist.isNullOrBlank()) {
             currentFetchJob = scope.launch {
-                val fetchedGenre = fetchGenreFromITunes(title, artist)
+                val fetchedGenre = fetchGenreWithFallbacks(title, artist)
                 if (_currentMetadata.value?.title == title && _currentMetadata.value?.artist == artist) {
                     if (fetchedGenre != null) {
                         val cacheKey = "${artist}_${title}"
@@ -269,6 +280,33 @@ class MediaObserver(private val context: Context) {
                 }
             }
         }
+    }
+
+    private fun cleanStringForSearch(input: String): String {
+        var cleaned = input.replace(Regex("(?i)\\s*[\\[\\(].*?(official|video|audio|lyric|remaster|live).*?[\\]\\)]"), "")
+        cleaned = cleaned.replace(Regex("(?i)\\s*(\\(|ft\\.|feat\\.|prod\\.).*$"), "")
+        cleaned = cleaned.replace(Regex("(?i)\\s*-.*(official|video|audio|lyric|remaster|live).*$"), "")
+        return cleaned.trim()
+    }
+
+    private fun fetchGenreWithFallbacks(title: String, artist: String): String? {
+        var genre = fetchGenreFromITunes(title, artist)
+        if (genre != null) return genre
+
+        val cleanTitle = cleanStringForSearch(title)
+        val cleanArtist = cleanStringForSearch(artist)
+        
+        if (cleanTitle != title || cleanArtist != artist) {
+            genre = fetchGenreFromITunes(cleanTitle, cleanArtist)
+            if (genre != null) return genre
+        }
+        
+        if (cleanTitle.isNotBlank()) {
+            genre = fetchGenreFromITunes(cleanTitle, "")
+            if (genre != null) return genre
+        }
+        
+        return null
     }
 
     private fun fetchGenreFromITunes(title: String, artist: String): String? {

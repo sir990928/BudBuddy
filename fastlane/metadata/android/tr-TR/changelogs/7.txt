@@ -1,0 +1,6 @@
+✨ v1.4.1
+- Bildirim çevirisi sorunları düzeltildi
+- Güncelleme özelliği iyileştirildi
+- Sistem gezinme çubuğu kullanımı düzeltildi
+- Arayüz düzeltmeleri ve iyileştirmeler.
+- Meta veri ve müzik türü getirme iyileştirildi.

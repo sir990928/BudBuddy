@@ -58,7 +58,8 @@
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:src="@drawable/ic_headset" />
+                android:src="@drawable/ic_headset"
+                android:importantForAccessibility="no" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -75,7 +76,8 @@
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:src="@drawable/ic_battery"
-                android:layout_marginEnd="4dp" />
+                android:layout_marginEnd="4dp"
+                android:importantForAccessibility="no" />
 
             <TextView
                 android:id="@+id/notification_l_status"
@@ -101,7 +103,8 @@
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:src="@drawable/ic_headset" />
+                android:src="@drawable/ic_headset"
+                android:importantForAccessibility="no" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -118,7 +121,8 @@
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:src="@drawable/ic_battery"
-                android:layout_marginEnd="4dp" />
+                android:layout_marginEnd="4dp"
+                android:importantForAccessibility="no" />
 
             <TextView
                 android:id="@+id/notification_r_status"
@@ -139,7 +143,7 @@
         android:layout_marginTop="12dp"
         android:text="Toggle ANC / Ambient"
         style="?android:attr/borderlessButtonStyle"
-        android:textColor="?android:attr/colorAccent"
+        android:textColor="@color/notification_primary_text"
         android:textStyle="bold" />
 
 </LinearLayout>

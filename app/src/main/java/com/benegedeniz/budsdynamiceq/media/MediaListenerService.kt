@@ -37,11 +37,14 @@ class MediaListenerService : NotificationListenerService() {
         val notification = sbn.notification
         val template = notification.extras.getString(Notification.EXTRA_TEMPLATE)
         
-        if (template == "android.app.Notification\$MediaStyle" || 
-            template == "androidx.media.app.NotificationCompat\$MediaStyle") {
+        if (template?.contains("MediaStyle") == true || notification.extras.containsKey(Notification.EXTRA_MEDIA_SESSION)) {
             
-            val title = notification.extras.getString(Notification.EXTRA_TITLE)
-            val artist = notification.extras.getString(Notification.EXTRA_TEXT)
+            val title = notification.extras.getCharSequence(Notification.EXTRA_TITLE)?.toString()
+            var artist = notification.extras.getCharSequence(Notification.EXTRA_TEXT)?.toString()
+            
+            if (artist.isNullOrBlank()) {
+                artist = notification.extras.getCharSequence(Notification.EXTRA_SUB_TEXT)?.toString()
+            }
             
             if (!title.isNullOrBlank()) {
                 Log.d("MediaListenerService", "Extracted song from notification: $artist - $title")

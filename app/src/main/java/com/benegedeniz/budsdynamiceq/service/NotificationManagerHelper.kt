@@ -78,8 +78,9 @@ class NotificationManagerHelper(private val context: Context) {
             setOnClickPendingIntent(R.id.notification_toggle_button, togglePendingIntent)
         }
 
-        val collapsedTitle = if (isConnected) context.getString(R.string.connected) else context.getString(R.string.disconnected)
-        val collapsedText = context.getString(R.string.expand_for_more)
+        val localizedContext = com.benegedeniz.budsdynamiceq.util.LanguageUtils.setLocale(context)
+        val collapsedTitle = if (isConnected) localizedContext.getString(R.string.connected) else localizedContext.getString(R.string.disconnected)
+        val collapsedText = localizedContext.getString(R.string.expand_for_more)
 
         return NotificationCompat.Builder(context, "buds_service_channel")
             .setSmallIcon(R.mipmap.ic_launcher) 

@@ -1,0 +1,6 @@
+✨ v1.4.1
+- Bildiriş tərcüməsi problemləri düzəldildi
+- Yeniləmə xüsusiyyəti təkmilləşdirildi
+- Sistem naviqasiya paneli idarəetməsi düzəldildi
+- UI düzəlişləri və təkmilləşdirmələr.
+- Metaməlumat və janr əldə etmə təkmilləşdirildi.

@@ -109,7 +109,7 @@ class BudsService : Service() {
         notificationManagerHelper = NotificationManagerHelper(this)
         notificationManagerHelper.createNotificationChannel()
         startForeground(1, notificationManagerHelper.buildNotification(
-            titleText = "Initializing...", 
+            titleText = getString(R.string.connecting_97), 
             ruleNcText = getString(R.string.waiting_for_connection), 
             hardwareNcText = "", 
             lBatteryText = "", 
@@ -190,11 +190,25 @@ class BudsService : Service() {
             scope = scope,
             budsController = budsController,
             mediaObserver = mediaObserver,
-            rulesRepository = rulesRepository,
+            rulesRepository = rulesRepository
+        )
+        rulesCoordinator.start()
+
+        val notificationCoordinator = NotificationCoordinator(
+            context = this,
+            scope = scope,
+            budsController = budsController,
             transientNotificationFlow = transientNotificationFlow,
             notificationManagerHelper = notificationManagerHelper
         )
-        rulesCoordinator.start()
+        notificationCoordinator.start()
+
+        val widgetCoordinator = WidgetCoordinator(
+            context = this,
+            scope = scope,
+            budsController = budsController
+        )
+        widgetCoordinator.start()
 
         // Handle gesture detection feedback
         scope.launch {

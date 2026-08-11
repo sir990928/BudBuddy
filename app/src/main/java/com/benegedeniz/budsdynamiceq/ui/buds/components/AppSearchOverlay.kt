@@ -116,7 +116,7 @@ fun AppSearchOverlay(
             val query = searchQuery.lowercase()
             
             LazyColumn(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().imePadding(),
                 contentPadding = PaddingValues(bottom = 120.dp, top = 16.dp)
             ) {
                 if (searchQuery.isBlank()) {
