@@ -63,6 +63,7 @@ fun AppSearchOverlay(
 ) {
     var searchQuery by remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
+    val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
 
     val context = LocalContext.current
 
@@ -77,6 +78,8 @@ fun AppSearchOverlay(
         if (isVisible) {
             searchQuery = ""
             try { focusRequester.requestFocus() } catch (e: Exception) {}
+        } else {
+            focusManager.clearFocus()
         }
     }
 

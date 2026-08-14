@@ -32,6 +32,16 @@ fun SearchBarInput(
     val focusManager = LocalFocusManager.current
     var isFocused by remember { mutableStateOf(false) }
 
+    val isImeVisible = androidx.compose.foundation.layout.WindowInsets.ime.getBottom(androidx.compose.ui.platform.LocalDensity.current) > 0
+    var previousImeVisible by remember { mutableStateOf(isImeVisible) }
+    
+    LaunchedEffect(isImeVisible) {
+        if (previousImeVisible && !isImeVisible && isFocused) {
+            focusManager.clearFocus()
+        }
+        previousImeVisible = isImeVisible
+    }
+
     if (isFocused) {
         BackHandler {
             focusManager.clearFocus()

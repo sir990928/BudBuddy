@@ -134,6 +134,14 @@ fun RulesScreen(
 
 
     val isScrolled by remember { derivedStateOf { listState.listState.firstVisibleItemIndex > 0 || listState.listState.firstVisibleItemScrollOffset > 20 } }
+    
+    val focusManager = LocalFocusManager.current
+    
+    LaunchedEffect(isScrolled) {
+        if (isScrolled) {
+            focusManager.clearFocus()
+        }
+    }
 
     var overscrollAmount by remember { mutableFloatStateOf(0f) }
 
