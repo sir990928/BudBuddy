@@ -1,0 +1,4 @@
+✨ v1.4.2
+- Manuel bağlantı kesildikten sonra arka plan servisinin çalışmaya devam etmesi sorunu düzeltildi
+- Başlangıçta uygulamanın eski bir kayıtlı cihaz anahtarını kontrol etmesine neden olan hata düzeltildi
+- Genel hata düzeltmeleri ve kararlılık iyileştirmeleri

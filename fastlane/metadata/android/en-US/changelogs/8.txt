@@ -1,0 +1,4 @@
+✨ v1.4.2
+- Fixed an issue where the background service remained active after manual disconnection
+- Fixed a bug causing the app to check for an outdated saved device key on startup
+- General bug fixes and stability improvements

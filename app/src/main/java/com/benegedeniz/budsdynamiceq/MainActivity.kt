@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
         
         // Start Foreground Service only if we have a saved device
         val prefs = getSharedPreferences("BudsPrefs", Context.MODE_PRIVATE)
-        val hasSavedDevice = prefs.getString("TargetDeviceMac", null) != null
+        val hasSavedDevice = prefs.getString("saved_mac_address", null) != null
         
         if (hasSavedDevice && PermissionManager.hasRequiredPermissions(this)) {
             val serviceIntent = Intent(this, com.benegedeniz.budsdynamiceq.service.BudsService::class.java)

@@ -1,0 +1,4 @@
+✨ v1.4.2
+- Manuel bağlantı kəsildikdən sonra arxa plan xidmətinin işləməyə davam etməsi problemi düzəldildi
+- Başlanğıcda tətbiqin köhnə yadda saxlanılmış cihaz açarını yoxlamasına səbəb olan xəta düzəldildi
+- Ümumi xəta düzəlişləri və sabitlik təkmilləşdirmələri
