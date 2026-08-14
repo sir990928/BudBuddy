@@ -285,79 +285,77 @@ class BudsController(
 
         connectionJob?.cancel()
         connectionJob = scope.launch {
-            while (true) {
-                deviceState.isConnecting.value = true
-                deviceState.isConnected.value = false
-                try {
-                    Log.d(TAG, "Attempting connection to ${device.address}")
-                    socket = device.createRfcommSocketToServiceRecord(BUDS_SPP_UUID)
-                    socket?.connect()
-                    
-                    deviceState.isConnected.value = true
-                    deviceState.isConnecting.value = false
-                    lastConnectedTime = System.currentTimeMillis()
-                    Log.i(TAG, "Connected to Galaxy Buds.")
+            deviceState.isConnecting.value = true
+            deviceState.isConnected.value = false
+            try {
+                Log.d(TAG, "Attempting connection to ${device.address}")
+                socket = device.createRfcommSocketToServiceRecord(BUDS_SPP_UUID)
+                socket?.connect()
+                
+                deviceState.isConnected.value = true
+                deviceState.isConnecting.value = false
+                lastConnectedTime = System.currentTimeMillis()
+                Log.i(TAG, "Connected to Galaxy Buds.")
 
-                    packetQueue.trySend(SppPacketEncoder.buildPacket(0x26.toByte(), byteArrayOf()))
-                    disableHardwareAutoPause()
+                packetQueue.trySend(SppPacketEncoder.buildPacket(0x26.toByte(), byteArrayOf()))
+                disableHardwareAutoPause()
 
-                    val buffer = ByteArray(4096)
-                    var index = 0
-                    while (true) {
-                        val bytes = socket?.inputStream?.read(buffer, index, buffer.size - index) ?: -1
-                        if (bytes == -1) break
-                        index += bytes
+                val buffer = ByteArray(4096)
+                var index = 0
+                while (true) {
+                    val bytes = socket?.inputStream?.read(buffer, index, buffer.size - index) ?: -1
+                    if (bytes == -1) break
+                    index += bytes
 
-                        var processed = 0
-                        while (processed < index) {
-                            if (buffer[processed] != 0xFD.toByte()) {
-                                processed++
-                                continue
-                            }
-
-                            if (index - processed < 3) break
-
-                            val header = (buffer[processed + 1].toInt() and 0xFF) or ((buffer[processed + 2].toInt() and 0xFF) shl 8)
-                            val size = header and 0x3FF
-                            val payloadSize = maxOf(0, size - 3)
-                            val packetSize = 4 + size
-
-                            if (packetSize > 1024) {
-                                processed++
-                                continue
-                            }
-
-                            if (index - processed < packetSize) break
-
-                            if (buffer[processed + packetSize - 1] != 0xDD.toByte()) {
-                                processed++
-                                continue
-                            }
-
-                            val msgId = buffer[processed + 3]
-                            val payload = buffer.copyOfRange(processed + 4, processed + 4 + payloadSize)
-                            
-                            packetParser.parsePacket(msgId, payload, payloadSize)
-
-                            processed += packetSize
+                    var processed = 0
+                    while (processed < index) {
+                        if (buffer[processed] != 0xFD.toByte()) {
+                            processed++
+                            continue
                         }
 
-                        if (processed > 0) {
-                            val remaining = index - processed
-                            System.arraycopy(buffer, processed, buffer, 0, remaining)
-                            index = remaining
+                        if (index - processed < 3) break
+
+                        val header = (buffer[processed + 1].toInt() and 0xFF) or ((buffer[processed + 2].toInt() and 0xFF) shl 8)
+                        val size = header and 0x3FF
+                        val payloadSize = maxOf(0, size - 3)
+                        val packetSize = 4 + size
+
+                        if (packetSize > 1024) {
+                            processed++
+                            continue
                         }
+
+                        if (index - processed < packetSize) break
+
+                        if (buffer[processed + packetSize - 1] != 0xDD.toByte()) {
+                            processed++
+                            continue
+                        }
+
+                        val msgId = buffer[processed + 3]
+                        val payload = buffer.copyOfRange(processed + 4, processed + 4 + payloadSize)
+                        
+                        packetParser.parsePacket(msgId, payload, payloadSize)
+
+                        processed += packetSize
                     }
-                } catch (e: IOException) {
-                    Log.e(TAG, "Connection error: ${e.message}")
-                } finally {
-                    closeSocket()
-                    deviceState.isConnected.value = false
-                    deviceState.isSpatialActive.value = false
-                    deviceState.reset()
-                    keepAliveJob?.cancel()
+
+                    if (processed > 0) {
+                        val remaining = index - processed
+                        System.arraycopy(buffer, processed, buffer, 0, remaining)
+                        index = remaining
+                    }
                 }
-                delay(500)
+            } catch (e: IOException) {
+                Log.e(TAG, "Connection error: ${e.message}")
+            } finally {
+                closeSocket()
+                deviceState.isConnected.value = false
+                deviceState.isConnecting.value = false
+                deviceState.isSpatialActive.value = false
+                deviceState.reset()
+                keepAliveJob?.cancel()
             }
         }
     }

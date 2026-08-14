@@ -39,29 +39,7 @@ class BudsService : Service() {
     private lateinit var notificationManagerHelper: NotificationManagerHelper
     private var notificationCoordinator: NotificationCoordinator? = null
 
-    private val bluetoothReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent?.action == android.bluetooth.BluetoothDevice.ACTION_ACL_CONNECTED) {
-                val device = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    intent.getParcelableExtra(android.bluetooth.BluetoothDevice.EXTRA_DEVICE, android.bluetooth.BluetoothDevice::class.java)
-                } else {
-                    @Suppress("DEPRECATION")
-                    intent.getParcelableExtra<android.bluetooth.BluetoothDevice>(android.bluetooth.BluetoothDevice.EXTRA_DEVICE)
-                }
-                if (device != null) {
-                    val name = try { device.name } catch (e: SecurityException) { null }
-                    if (name != null && name.contains("Buds", ignoreCase = true)) {
-                        Log.i(TAG, "Detected Buds connection: \$name (\${device.address})")
-                        val budsController = ServiceLocator.provideBudsController(this@BudsService)
-                        if (budsController.savedDeviceMac.value != device.address) {
-                            Log.i(TAG, "Automatically switching to newly connected Buds: \$name")
-                            budsController.connect(device)
-                        }
-                    }
-                }
-            }
-        }
-    }
+
 
     private val toggleReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -105,9 +83,6 @@ class BudsService : Service() {
             @Suppress("UnspecifiedRegisterReceiverFlag")
             registerReceiver(toggleReceiver, filter)
         }
-
-        val btFilter = IntentFilter(android.bluetooth.BluetoothDevice.ACTION_ACL_CONNECTED)
-        ContextCompat.registerReceiver(this, bluetoothReceiver, btFilter, ContextCompat.RECEIVER_EXPORTED)
 
         notificationManagerHelper = NotificationManagerHelper(this)
         notificationManagerHelper.createNotificationChannel()
@@ -265,6 +240,9 @@ class BudsService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == "com.benegedeniz.budsdynamiceq.AUTO_CONNECT") {
+            ServiceLocator.provideBudsController(this).startAutoConnect()
+        }
         return START_STICKY
     }
 
@@ -280,7 +258,6 @@ class BudsService : Service() {
         super.onDestroy()
         notificationCoordinator?.stop()
         try { unregisterReceiver(toggleReceiver) } catch (_: IllegalArgumentException) {}
-        try { unregisterReceiver(bluetoothReceiver) } catch (_: IllegalArgumentException) {}
         scope.cancel()
         
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

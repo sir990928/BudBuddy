@@ -507,4 +507,21 @@
     <string name="privacy">Məxfilik</string>
     <string name="fetch_genre_from_itunes">Janrları iTunes-dan gətir</string>
     <string name="fetch_genre_from_itunes_desc">Mahnı janrları yerli mediada yoxdursa, onları iTunes API-dən avtomatik gətir.</string>
+    <string name="general_settings">Ümumi</string>
+    <string name="theme_preference">Tema Seçimi</string>
+    <string name="theme_system">Sistem</string>
+    <string name="theme_light">Açıq</string>
+    <string name="theme_dark">Tünd</string>
+    <string name="enable_ui_haptics">İnterfeys Titrəməsi</string>
+    <string name="enable_ui_haptics_desc">Toxunma üçün titrəmə əks-əlaqəsini aktivləşdirin.</string>
+    <string name="show_toast_rule_match">Qayda Tətbiq Edildikdə Bildiriş Göstər</string>
+    <string name="show_toast_rule_match_desc">Bir qayda avtomatik tətbiq edildikdə qısa bir mesaj göstər.</string>
+    <string name="system_integration">Sistem İnteqrasiyası</string>
+    <string name="start_on_boot">Cihaz Açılanda Başlat</string>
+    <string name="start_on_boot_desc">Cihaz açıldıqda arxa plan xidmətini avtomatik başlat.</string>
+    <string name="auto_connect_buds">Qulaqlıqlara Avtomatik Qoşul</string>
+    <string name="auto_connect_buds_desc">Yadda saxlanılmış Galaxy Buds cihazı qoşulduqda xidməti başlat.</string>
+    <string name="clear_genre_cache">Janr Keşini Təmizlə</string>
+    <string name="clear_genre_cache_desc">Yerli keşi təmizləyərək janrların yenidən yüklənməsini məcbur et.</string>
+    <string name="cache_cleared">Keş uğurla təmizləndi.</string>
 </resources>

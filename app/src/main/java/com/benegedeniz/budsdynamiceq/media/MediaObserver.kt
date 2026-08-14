@@ -207,6 +207,12 @@ class MediaObserver(private val context: Context) {
         handleNewMetadata(title, artist, null)
     }
 
+    fun clearCache() {
+        genreCache.edit().clear().apply()
+        failedGenreFetches.clear()
+        Log.d(TAG, "Genre cache cleared")
+    }
+
     private fun handleNewMetadata(title: String?, artist: String?, genre: String?) {
         // If we have a native genre, it's a success right away.
         var initialState = if (!genre.isNullOrBlank()) GenreFetchState.SUCCESS else GenreFetchState.NONE

@@ -507,4 +507,21 @@
     <string name="privacy">Privacy</string>
     <string name="fetch_genre_from_itunes">Fetch Genre from iTunes</string>
     <string name="fetch_genre_from_itunes_desc">Automatically fetch song genres from the iTunes API if they are missing from your local media metadata.</string>
+    <string name="general_settings">General</string>
+    <string name="theme_preference">Theme Preference</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="enable_ui_haptics">Enable UI Haptics</string>
+    <string name="enable_ui_haptics_desc">Enable vibration feedback for interactions.</string>
+    <string name="show_toast_rule_match">Show Toast on Rule Match</string>
+    <string name="show_toast_rule_match_desc">Show a brief message when a rule automatically applies.</string>
+    <string name="system_integration">System Integration</string>
+    <string name="start_on_boot">Start on Boot</string>
+    <string name="start_on_boot_desc">Start the background service automatically when the device turns on.</string>
+    <string name="auto_connect_buds">Auto-Connect to Buds</string>
+    <string name="auto_connect_buds_desc">Start the service when your saved Galaxy Buds connect via Bluetooth.</string>
+    <string name="clear_genre_cache">Clear Genre Cache</string>
+    <string name="clear_genre_cache_desc">Clear locally cached genres and failed fetch history.</string>
+    <string name="cache_cleared">Cache cleared successfully.</string>
 </resources>

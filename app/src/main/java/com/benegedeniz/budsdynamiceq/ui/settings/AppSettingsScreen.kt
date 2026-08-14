@@ -78,7 +78,17 @@ fun AppSettingsScreen(
     }
 
     var isLanguageExpanded by remember { mutableStateOf(false) }
+    var isGeneralExpanded by remember { mutableStateOf(false) }
+    var isMusicRulesExpanded by remember { mutableStateOf(false) }
+    var isSystemIntExpanded by remember { mutableStateOf(false) }
     var isAboutExpanded by remember { mutableStateOf(false) }
+
+    var themePreference by remember { mutableStateOf(prefs.getInt("theme_preference", 0)) }
+    var enableHaptics by remember { mutableStateOf(prefs.getBoolean("enable_haptics", true)) }
+    var showToastRuleMatch by remember { mutableStateOf(prefs.getBoolean("rule_toast_enabled", true)) }
+    var startOnBoot by remember { mutableStateOf(prefs.getBoolean("start_on_boot", false)) }
+    var autoConnectBuds by remember { mutableStateOf(prefs.getBoolean("auto_connect", false)) }
+    var enableItunesGenreFetching by remember { mutableStateOf(prefs.getBoolean("enable_itunes_genre_fetching", true)) }
 
     val updateStatus by UpdateChecker.updateStatus.collectAsState()
 
@@ -387,10 +397,7 @@ fun AppSettingsScreen(
                 }
             }
 
-            // Privacy Settings Accordion Card (Collapsed by Default)
-            var isPrivacyExpanded by remember { mutableStateOf(false) }
-            val enableItunesGenreFetching = remember { mutableStateOf(prefs.getBoolean("enable_itunes_genre_fetching", true)) }
-
+            // General Settings Accordion Card (Collapsed by Default)
             Card(
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(
@@ -404,7 +411,7 @@ fun AppSettingsScreen(
                             .fillMaxWidth()
                             .clickable {
                                 haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                isPrivacyExpanded = !isPrivacyExpanded
+                                isGeneralExpanded = !isGeneralExpanded
                             }
                             .padding(20.dp),
                         verticalAlignment = Alignment.CenterVertically,
@@ -415,27 +422,163 @@ fun AppSettingsScreen(
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Lock,
+                                imageVector = Icons.Default.SystemUpdate, // Replace with appropriate icon later if needed
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(24.dp)
                             )
                             Text(
-                                text = stringResource(R.string.privacy),
+                                text = stringResource(R.string.general_settings),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                         }
                         Icon(
-                            imageVector = if (isPrivacyExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                            imageVector = if (isGeneralExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
 
                     AnimatedVisibility(
-                        visible = isPrivacyExpanded,
+                        visible = isGeneralExpanded,
+                        enter = fadeIn() + expandVertically(),
+                        exit = fadeOut() + shrinkVertically()
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 20.dp)
+                                .padding(bottom = 20.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            HorizontalDivider(
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.15f),
+                                modifier = Modifier.padding(bottom = 4.dp)
+                            )
+                            
+                            // Theme Preference
+                            Column(modifier = Modifier.fillMaxWidth()) {
+                                Text(
+                                    text = stringResource(R.string.theme_preference),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                
+                                val themeOptions = listOf(
+                                    Pair(0, stringResource(R.string.theme_system)),
+                                    Pair(1, stringResource(R.string.theme_light)),
+                                    Pair(2, stringResource(R.string.theme_dark))
+                                )
+                                
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    themeOptions.forEach { (value, label) ->
+                                        val isSelected = themePreference == value
+                                        FilterChip(
+                                            selected = isSelected,
+                                            onClick = {
+                                                if (!isSelected) {
+                                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                                    themePreference = value
+                                                    prefs.edit().putInt("theme_preference", value).apply()
+                                                }
+                                            },
+                                            label = { Text(label) },
+                                            colors = FilterChipDefaults.filterChipColors(
+                                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        )
+                                    }
+                                }
+                            }
+                            
+                            // Haptic Feedback
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Column(modifier = Modifier.weight(1f).padding(end = 16.dp)) {
+                                    Text(
+                                        text = stringResource(R.string.enable_ui_haptics),
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = stringResource(R.string.enable_ui_haptics_desc),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                Switch(
+                                    checked = enableHaptics,
+                                    onCheckedChange = { isChecked ->
+                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        enableHaptics = isChecked
+                                        prefs.edit().putBoolean("enable_haptics", isChecked).apply()
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Music Rules Accordion Card
+            Card(
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                ),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                isMusicRulesExpanded = !isMusicRulesExpanded
+                            }
+                            .padding(20.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Icon(
+                                imageVector = androidx.compose.material.icons.Icons.AutoMirrored.Filled.OpenInNew, // Just a placeholder icon, let's use something generic like Settings
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Text(
+                                text = stringResource(R.string.music_rules),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                        Icon(
+                            imageVector = if (isMusicRulesExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+
+                    AnimatedVisibility(
+                        visible = isMusicRulesExpanded,
                         enter = fadeIn() + expandVertically(),
                         exit = fadeOut() + shrinkVertically()
                     ) {
@@ -458,6 +601,35 @@ fun AppSettingsScreen(
                             ) {
                                 Column(modifier = Modifier.weight(1f).padding(end = 16.dp)) {
                                     Text(
+                                        text = stringResource(R.string.show_toast_rule_match),
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = stringResource(R.string.show_toast_rule_match_desc),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                Switch(
+                                    checked = showToastRuleMatch,
+                                    onCheckedChange = { isChecked ->
+                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        showToastRuleMatch = isChecked
+                                        prefs.edit().putBoolean("rule_toast_enabled", isChecked).apply()
+                                    }
+                                )
+                            }
+                            
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Column(modifier = Modifier.weight(1f).padding(end = 16.dp)) {
+                                    Text(
                                         text = stringResource(R.string.fetch_genre_from_itunes),
                                         style = MaterialTheme.typography.bodyLarge,
                                         fontWeight = FontWeight.Bold,
@@ -471,11 +643,159 @@ fun AppSettingsScreen(
                                     )
                                 }
                                 Switch(
-                                    checked = enableItunesGenreFetching.value,
+                                    checked = enableItunesGenreFetching,
                                     onCheckedChange = { isChecked ->
                                         haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                        enableItunesGenreFetching.value = isChecked
+                                        enableItunesGenreFetching = isChecked
                                         prefs.edit().putBoolean("enable_itunes_genre_fetching", isChecked).apply()
+                                    }
+                                )
+                            }
+                            
+                            // Clear Genre Cache Button
+                            OutlinedButton(
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    com.benegedeniz.budsdynamiceq.di.ServiceLocator.provideMediaObserver(context).clearCache()
+                                    android.widget.Toast.makeText(context, context.getString(R.string.cache_cleared), android.widget.Toast.LENGTH_SHORT).show()
+                                },
+                                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                                shape = RoundedCornerShape(14.dp),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Refresh,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = stringResource(R.string.clear_genre_cache),
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // System Integration Accordion Card
+            Card(
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                ),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                isSystemIntExpanded = !isSystemIntExpanded
+                            }
+                            .padding(20.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Android,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Text(
+                                text = stringResource(R.string.system_integration),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                        Icon(
+                            imageVector = if (isSystemIntExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+
+                    AnimatedVisibility(
+                        visible = isSystemIntExpanded,
+                        enter = fadeIn() + expandVertically(),
+                        exit = fadeOut() + shrinkVertically()
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 20.dp)
+                                .padding(bottom = 20.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            HorizontalDivider(
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.15f),
+                                modifier = Modifier.padding(bottom = 4.dp)
+                            )
+                            
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Column(modifier = Modifier.weight(1f).padding(end = 16.dp)) {
+                                    Text(
+                                        text = stringResource(R.string.start_on_boot),
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = stringResource(R.string.start_on_boot_desc),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                Switch(
+                                    checked = startOnBoot,
+                                    onCheckedChange = { isChecked ->
+                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        startOnBoot = isChecked
+                                        prefs.edit().putBoolean("start_on_boot", isChecked).apply()
+                                    }
+                                )
+                            }
+                            
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Column(modifier = Modifier.weight(1f).padding(end = 16.dp)) {
+                                    Text(
+                                        text = stringResource(R.string.auto_connect_buds),
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = stringResource(R.string.auto_connect_buds_desc),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                Switch(
+                                    checked = autoConnectBuds,
+                                    onCheckedChange = { isChecked ->
+                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        autoConnectBuds = isChecked
+                                        prefs.edit().putBoolean("auto_connect", isChecked).apply()
                                     }
                                 )
                             }
@@ -483,6 +803,8 @@ fun AppSettingsScreen(
                     }
                 }
             }
+
+
 
             // About App Accordion Card (Collapsed by Default)
             Card(

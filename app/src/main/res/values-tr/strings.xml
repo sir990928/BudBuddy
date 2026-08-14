@@ -507,4 +507,21 @@
     <string name="privacy">Gizlilik</string>
     <string name="fetch_genre_from_itunes">Türleri iTunes\'tan Getir</string>
     <string name="fetch_genre_from_itunes_desc">Medya dosyanızda eksikse, şarkı türlerini otomatik olarak iTunes API\'sinden çek.</string>
+    <string name="general_settings">Genel</string>
+    <string name="theme_preference">Tema Tercihi</string>
+    <string name="theme_system">Sistem</string>
+    <string name="theme_light">Açık</string>
+    <string name="theme_dark">Koyu</string>
+    <string name="enable_ui_haptics">Arayüz Titreşimi</string>
+    <string name="enable_ui_haptics_desc">Etkileşimler için titreşim geri bildirimini etkinleştirin.</string>
+    <string name="show_toast_rule_match">Kural Eşleştiğinde Bildirim Göster</string>
+    <string name="show_toast_rule_match_desc">Bir kural otomatik olarak uygulandığında kısa bir mesaj göster.</string>
+    <string name="system_integration">Sistem Entegrasyonu</string>
+    <string name="start_on_boot">Cihaz Başlarken Çalıştır</string>
+    <string name="start_on_boot_desc">Cihaz açıldığında arka plan servisini otomatik olarak başlat.</string>
+    <string name="auto_connect_buds">Kulaklıklara Otomatik Bağlan</string>
+    <string name="auto_connect_buds_desc">Kaydedilmiş Galaxy Buds bluetooth üzerinden bağlandığında servisi başlat.</string>
+    <string name="clear_genre_cache">Tür Ön belleğini Temizle</string>
+    <string name="clear_genre_cache_desc">Yerel önbelleği temizleyerek türlerin yeniden indirilmesini zorla.</string>
+    <string name="cache_cleared">Önbellek başarıyla temizlendi.</string>
 </resources>

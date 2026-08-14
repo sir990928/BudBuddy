@@ -87,9 +87,19 @@ class RulesCoordinator(
                     val ncToSend = if (activeRuleInheritsNc) manualNc else matchingRule.noiseControl
                                              
                     if (justConnected || justPutBothInEar || budsController.lastMatchedRule.value != matchingRule || ruleDefaultChanged) {
+                        val newRuleMatched = budsController.lastMatchedRule.value != matchingRule
                         budsController.setLastMatchedRule(matchingRule)
                         if (eqToSend != null) budsController.sendEqualizer(eqToSend)
                         if (ncToSend != null) budsController.sendNoiseControl(ncToSend)
+                        
+                        if (newRuleMatched && !justConnected && !justPutBothInEar) {
+                            val prefs = context.getSharedPreferences("BudsPrefs", Context.MODE_PRIVATE)
+                            if (prefs.getBoolean("rule_toast_enabled", true)) {
+                                android.os.Handler(android.os.Looper.getMainLooper()).post {
+                                    android.widget.Toast.makeText(context, "Applied: ${matchingRule.keyword}", android.widget.Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
                         
                         lastAppliedManualEq = manualEq
                         lastAppliedManualNc = manualNc
