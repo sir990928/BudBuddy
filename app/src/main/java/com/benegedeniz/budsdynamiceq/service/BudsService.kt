@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import androidx.core.content.ContextCompat
 import com.benegedeniz.budsdynamiceq.R
 import com.benegedeniz.budsdynamiceq.data.model.EqPreset
 import com.benegedeniz.budsdynamiceq.data.model.NoiseControlMode
@@ -36,6 +37,7 @@ class BudsService : Service() {
     private val transientNotificationFlow = MutableStateFlow<Pair<String, String>?>(null)
     
     private lateinit var notificationManagerHelper: NotificationManagerHelper
+    private var notificationCoordinator: NotificationCoordinator? = null
 
     private val bluetoothReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -100,11 +102,12 @@ class BudsService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             registerReceiver(toggleReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
         } else {
+            @Suppress("UnspecifiedRegisterReceiverFlag")
             registerReceiver(toggleReceiver, filter)
         }
 
         val btFilter = IntentFilter(android.bluetooth.BluetoothDevice.ACTION_ACL_CONNECTED)
-        registerReceiver(bluetoothReceiver, btFilter)
+        ContextCompat.registerReceiver(this, bluetoothReceiver, btFilter, ContextCompat.RECEIVER_EXPORTED)
 
         notificationManagerHelper = NotificationManagerHelper(this)
         notificationManagerHelper.createNotificationChannel()
@@ -194,14 +197,14 @@ class BudsService : Service() {
         )
         rulesCoordinator.start()
 
-        val notificationCoordinator = NotificationCoordinator(
+        notificationCoordinator = NotificationCoordinator(
             context = this,
             scope = scope,
             budsController = budsController,
             transientNotificationFlow = transientNotificationFlow,
             notificationManagerHelper = notificationManagerHelper
         )
-        notificationCoordinator.start()
+        notificationCoordinator!!.start()
 
         val widgetCoordinator = WidgetCoordinator(
             context = this,
@@ -275,8 +278,9 @@ class BudsService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(toggleReceiver)
-        unregisterReceiver(bluetoothReceiver)
+        notificationCoordinator?.stop()
+        try { unregisterReceiver(toggleReceiver) } catch (_: IllegalArgumentException) {}
+        try { unregisterReceiver(bluetoothReceiver) } catch (_: IllegalArgumentException) {}
         scope.cancel()
         
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

@@ -67,6 +67,7 @@ class DeviceStateRepository {
     val activeNoiseControl = MutableStateFlow<NoiseControlMode?>(null)
 
     fun reset() {
+        isConnecting.value = false
         batteryL.value = -1
         batteryR.value = -1
         batteryCase.value = -1

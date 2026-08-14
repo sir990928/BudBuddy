@@ -22,6 +22,11 @@ class NotificationCoordinator(
         }
     }
 
+    fun stop() {
+        context.getSharedPreferences("BudsPrefs", Context.MODE_PRIVATE)
+            .unregisterOnSharedPreferenceChangeListener(prefListener)
+    }
+
     fun start() {
         context.getSharedPreferences("BudsPrefs", Context.MODE_PRIVATE)
             .registerOnSharedPreferenceChangeListener(prefListener)
