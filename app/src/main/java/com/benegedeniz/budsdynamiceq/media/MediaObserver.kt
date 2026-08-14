@@ -114,7 +114,11 @@ class MediaObserver(private val context: Context) {
             controller.unregisterCallback(callback)
         }
         controllerCallbacks.clear()
-        scope.cancel()
+        // Do NOT cancel the scope — MediaObserver is a singleton shared across service
+        // lifecycles. Cancelling the scope permanently kills it, causing genre fetches
+        // launched after a service restart to silently no-op and get stuck on LOADING.
+        currentFetchJob?.cancel()
+        currentFetchJob = null
     }
 
     private fun updateActiveControllers(controllers: List<MediaController>?) {
@@ -203,6 +207,12 @@ class MediaObserver(private val context: Context) {
         handleNewMetadata(title, artist, null)
     }
 
+    fun clearCache() {
+        genreCache.edit().clear().apply()
+        failedGenreFetches.clear()
+        Log.d(TAG, "Genre cache cleared")
+    }
+
     private fun handleNewMetadata(title: String?, artist: String?, genre: String?) {
         // If we have a native genre, it's a success right away.
         var initialState = if (!genre.isNullOrBlank()) GenreFetchState.SUCCESS else GenreFetchState.NONE
@@ -218,7 +228,13 @@ class MediaObserver(private val context: Context) {
             } else if (failedGenreFetches.contains(cacheKey)) {
                 initialState = GenreFetchState.ERROR
             } else {
-                initialState = GenreFetchState.LOADING
+                val prefs = context.getSharedPreferences("BudsPrefs", Context.MODE_PRIVATE)
+                if (prefs.getBoolean("enable_itunes_genre_fetching", true)) {
+                    initialState = GenreFetchState.LOADING
+                } else {
+                    // Do not attempt to fetch, keep as NONE
+                    initialState = GenreFetchState.NONE
+                }
             }
         }
 

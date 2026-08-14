@@ -101,7 +101,7 @@
 	<string name="fit_test_only_action">Uyğunluq Sınağı axındakı yeganə əməliyyat olmalıdır.</string>
 	<string name="earbud_removed_aborted">Qulaqlıq çıxarıldı, sınaq ləğv edildi.</string>
 	<string name="add">Əlavə Et</string>
-	<string name="music_rules_automatically_adjust_your_ea">Musiqi Qaydaları çalan mediaya görə qulaqlığınızın EQ və Səs-küy Nəzarəti ayarlarını avtomatik dəyişir. Açar sözlərlə qaydalar yaradın; mahnı adı və ya ifaçı uyğun gəldikdə ayarlarınız avtomatik tətbiq olunsun.</string>
+	<string name="music_rules_automatically_adjust_your_ea">Musiqi Qaydaları çalan mediaya görə qulaqlığınızın EQ və Səs-küy Nəzarəti ayarlarını avtomatik dəyişir. Açar sözlərlə qaydalar yaradın; mahnı adı və ya ifaçı uyğun gəldikdə ayarlarınız avtomatik tətbiq olunsun.\n\nAçar sözünüzdə title:, artist: və genre: kimi etiketlərdən istifadə edərək müəyyən sahələri hədəfləyə bilərsiniz (məs. \"title: Hello artist: Adele\").</string>
 	<string name="global_defaults">Qlobal Standartlar</string>
 	<string name="no_rules_yet">Hələ heç bir qayda yoxdur.</string>
 	<string name="tap_to_create_your_first_music_rule">İlk qaydanızı yaratmaq üçün +\'ya toxunun.</string>
@@ -503,5 +503,26 @@
 	<string name="search_app_wide">Axtarın...</string>
     <string name="start_typing_to_search">Axtarış üçün yazmağa başlayın...</string>
     <string name="no_results_found">Nəticə tapılmadı.</string>
-    <string name="changelog">Dəyişikliklər</string>
+    <string name="changelog">Yeniliklər</string>
+    <string name="privacy">Məxfilik</string>
+    <string name="fetch_genre_from_itunes">Janrları iTunes-dan gətir</string>
+    <string name="fetch_genre_from_itunes_desc">Mahnı janrları yerli mediada yoxdursa, onları iTunes API-dən avtomatik gətir.</string>
+    <string name="general_settings">Ümumi</string>
+    <string name="theme_preference">Tema Seçimi</string>
+    <string name="theme_system">Sistem</string>
+    <string name="theme_light">Açıq</string>
+    <string name="theme_dark">Tünd</string>
+    <string name="enable_ui_haptics">İnterfeys Titrəməsi</string>
+    <string name="enable_ui_haptics_desc">Toxunma üçün titrəmə əks-əlaqəsini aktivləşdirin.</string>
+    <string name="show_toast_rule_match">Qayda Tətbiq Edildikdə Bildiriş Göstər</string>
+    <string name="show_toast_rule_match_desc">Bir qayda avtomatik tətbiq edildikdə qısa bir mesaj göstər.</string>
+    <string name="system_integration">Sistem İnteqrasiyası</string>
+    <string name="start_on_boot">Cihaz Açılanda Başlat</string>
+    <string name="start_on_boot_desc">Cihaz açıldıqda arxa plan xidmətini avtomatik başlat.</string>
+    <string name="auto_connect_buds">Qulaqlıqlara Avtomatik Qoşul</string>
+    <string name="auto_connect_buds_desc">Yadda saxlanılmış Galaxy Buds cihazı qoşulduqda xidməti başlat.</string>
+    <string name="clear_genre_cache">Janr Keşini Təmizlə</string>
+    <string name="clear_genre_cache_desc">Yerli keşi təmizləyərək janrların yenidən yüklənməsini məcbur et.</string>
+    <string name="cache_cleared">Keş uğurla təmizləndi.</string>
+    <string name="rule_applied_toast">Tətbiq edildi: %1$s</string>
 </resources>

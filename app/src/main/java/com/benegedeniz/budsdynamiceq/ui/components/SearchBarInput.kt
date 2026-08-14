@@ -26,11 +26,21 @@ import com.benegedeniz.budsdynamiceq.R
 fun SearchBarInput(
     query: String,
     onQueryChange: (String) -> Unit,
-    placeholderText: String = "Search...",
+    placeholderText: String = stringResource(R.string.search_app_wide),
     modifier: Modifier = Modifier
 ) {
     val focusManager = LocalFocusManager.current
     var isFocused by remember { mutableStateOf(false) }
+
+    val isImeVisible = androidx.compose.foundation.layout.WindowInsets.ime.getBottom(androidx.compose.ui.platform.LocalDensity.current) > 0
+    var previousImeVisible by remember { mutableStateOf(isImeVisible) }
+    
+    LaunchedEffect(isImeVisible) {
+        if (previousImeVisible && !isImeVisible && isFocused) {
+            focusManager.clearFocus()
+        }
+        previousImeVisible = isImeVisible
+    }
 
     if (isFocused) {
         BackHandler {
