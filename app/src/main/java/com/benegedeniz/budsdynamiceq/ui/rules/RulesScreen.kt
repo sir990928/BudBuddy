@@ -106,6 +106,7 @@ fun RulesScreen(
     val manualNoiseControl = uiState.manualNoiseControl
     val lastMatchedRule = uiState.lastMatchedRule
     val context = LocalContext.current
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
 
     var searchQuery by remember { mutableStateOf("") }
     var data by remember { mutableStateOf(rules) }
@@ -156,6 +157,7 @@ fun RulesScreen(
             }
             override suspend fun onPreFling(available: Velocity): Velocity {
                 if (overscrollAmount > 250f) {
+                    haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
                     onOpenSearch()
                 }
                 overscrollAmount = 0f
@@ -179,6 +181,11 @@ fun RulesScreen(
     ) {
         val searchThreshold = 250f
         val isReadyToSearch = overscrollAmount > searchThreshold
+        LaunchedEffect(isReadyToSearch) {
+            if (isReadyToSearch) {
+                haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+            }
+        }
         val rotation by androidx.compose.animation.core.animateFloatAsState(targetValue = if (isReadyToSearch) 180f else 0f)
         val searchHintAlpha = (overscrollAmount / 150f).coerceIn(0f, 1f)
 
@@ -189,18 +196,26 @@ fun RulesScreen(
                 .graphicsLayer { alpha = searchHintAlpha },
             contentAlignment = Alignment.Center
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .background(
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        shape = RoundedCornerShape(percent = 50)
+                    )
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
                 Icon(
                     imageVector = Icons.Default.ArrowDownward,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer,
                     modifier = Modifier.size(16.dp).graphicsLayer { rotationZ = rotation }
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = if (isReadyToSearch) stringResource(R.string.release_to_search_app_wide) else stringResource(R.string.pull_down_to_search),
                     style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
             }
         }
