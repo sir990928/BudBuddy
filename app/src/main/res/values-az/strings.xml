@@ -101,7 +101,7 @@
 	<string name="fit_test_only_action">Uyğunluq Sınağı axındakı yeganə əməliyyat olmalıdır.</string>
 	<string name="earbud_removed_aborted">Qulaqlıq çıxarıldı, sınaq ləğv edildi.</string>
 	<string name="add">Əlavə Et</string>
-	<string name="music_rules_automatically_adjust_your_ea">Musiqi Qaydaları çalan mediaya görə qulaqlığınızın EQ və Səs-küy Nəzarəti ayarlarını avtomatik dəyişir. Açar sözlərlə qaydalar yaradın; mahnı adı və ya ifaçı uyğun gəldikdə ayarlarınız avtomatik tətbiq olunsun.</string>
+	<string name="music_rules_automatically_adjust_your_ea">Musiqi Qaydaları çalan mediaya görə qulaqlığınızın EQ və Səs-küy Nəzarəti ayarlarını avtomatik dəyişir. Açar sözlərlə qaydalar yaradın; mahnı adı və ya ifaçı uyğun gəldikdə ayarlarınız avtomatik tətbiq olunsun.\n\nAçar sözünüzdə title:, artist: və genre: kimi etiketlərdən istifadə edərək müəyyən sahələri hədəfləyə bilərsiniz (məs. \"title: Hello artist: Adele\").</string>
 	<string name="global_defaults">Qlobal Standartlar</string>
 	<string name="no_rules_yet">Hələ heç bir qayda yoxdur.</string>
 	<string name="tap_to_create_your_first_music_rule">İlk qaydanızı yaratmaq üçün +\'ya toxunun.</string>

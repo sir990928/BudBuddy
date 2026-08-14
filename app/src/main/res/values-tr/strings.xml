@@ -101,7 +101,7 @@
 	<string name="fit_test_only_action">Uyum Testi akıştaki tek eylem olmalıdır.</string>
 	<string name="earbud_removed_aborted">Kulaklık çıkarıldı, test iptal edildi.</string>
 	<string name="add">Ekle</string>
-	<string name="music_rules_automatically_adjust_your_ea">Müzik Kuralları, çalan medyaya göre kulaklığınızın EQ ve Gürültü Kontrolü ayarlarını otomatik değiştirir. Anahtar kelimelerle kurallar oluşturun; şarkı adı veya sanatçı eşleştiğinde ayarlarınız otomatik uygulansın.</string>
+	<string name="music_rules_automatically_adjust_your_ea">Müzik Kuralları, çalan medyaya göre kulaklığınızın EQ ve Gürültü Kontrolü ayarlarını otomatik değiştirir. Anahtar kelimelerle kurallar oluşturun; şarkı adı veya sanatçı eşleştiğinde ayarlarınız otomatik uygulansın.\n\nAnahtar kelimenizde title:, artist: ve genre: gibi etiketler kullanarak belirli alanları hedefleyebilirsiniz (ör. \"title: Hello artist: Adele\").</string>
 	<string name="global_defaults">Genel Varsayılanlar</string>
 	<string name="no_rules_yet">Henüz kural yok.</string>
 	<string name="tap_to_create_your_first_music_rule">İlk kuralınızı oluşturmak için +\'ya dokunun.</string>
