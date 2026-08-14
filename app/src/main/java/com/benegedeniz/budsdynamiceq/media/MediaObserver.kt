@@ -222,7 +222,13 @@ class MediaObserver(private val context: Context) {
             } else if (failedGenreFetches.contains(cacheKey)) {
                 initialState = GenreFetchState.ERROR
             } else {
-                initialState = GenreFetchState.LOADING
+                val prefs = context.getSharedPreferences("BudsPrefs", Context.MODE_PRIVATE)
+                if (prefs.getBoolean("enable_itunes_genre_fetching", true)) {
+                    initialState = GenreFetchState.LOADING
+                } else {
+                    // Do not attempt to fetch, keep as NONE
+                    initialState = GenreFetchState.NONE
+                }
             }
         }
 

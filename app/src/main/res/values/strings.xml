@@ -504,4 +504,7 @@
     <string name="start_typing_to_search">Start typing to search...</string>
     <string name="no_results_found">No results found.</string>
     <string name="changelog">Changelog</string>
+    <string name="privacy">Privacy</string>
+    <string name="fetch_genre_from_itunes">Fetch Genre from iTunes</string>
+    <string name="fetch_genre_from_itunes_desc">Automatically fetch song genres from the iTunes API if they are missing from your local media metadata.</string>
 </resources>

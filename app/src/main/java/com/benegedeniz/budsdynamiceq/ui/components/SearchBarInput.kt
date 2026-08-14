@@ -26,7 +26,7 @@ import com.benegedeniz.budsdynamiceq.R
 fun SearchBarInput(
     query: String,
     onQueryChange: (String) -> Unit,
-    placeholderText: String = "Search...",
+    placeholderText: String = stringResource(R.string.search_app_wide),
     modifier: Modifier = Modifier
 ) {
     val focusManager = LocalFocusManager.current

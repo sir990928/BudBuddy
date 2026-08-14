@@ -503,5 +503,8 @@
 	<string name="search_app_wide">Axtarın...</string>
     <string name="start_typing_to_search">Axtarış üçün yazmağa başlayın...</string>
     <string name="no_results_found">Nəticə tapılmadı.</string>
-    <string name="changelog">Dəyişikliklər</string>
+    <string name="changelog">Yeniliklər</string>
+    <string name="privacy">Məxfilik</string>
+    <string name="fetch_genre_from_itunes">Janrları iTunes-dan gətir</string>
+    <string name="fetch_genre_from_itunes_desc">Mahnı janrları yerli mediada yoxdursa, onları iTunes API-dən avtomatik gətir.</string>
 </resources>
