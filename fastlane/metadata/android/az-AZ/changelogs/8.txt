@@ -1,4 +1,6 @@
 ✨ v1.5.0
-- Manuel bağlantı kəsildikdən sonra arxa plan xidmətinin işləməyə davam etməsi problemi düzəldildi
-- Başlanğıcda tətbiqin köhnə yadda saxlanılmış cihaz açarını yoxlamasına səbəb olan xəta düzəldildi
-- Ümumi xəta düzəlişləri və sabitlik təkmilləşdirmələri
+- Yenilənmiş Tənzimləmələr İnterfeysi: Daha yaxşı təşkil edilmiş menyular, yeni ikonlar və təkmilləşdirilmiş dizayn
+- Ağıllı Avtomatik Qoşulma: Qulaqlıqlarınız telefona bağlandıqda tətbiq artıq arxa planda avtomatik və səmərəli şəkildə qoşulur
+- "Cihaz Açılanda Başlat" və "Qulaqlıqlara Avtomatik Qoşul" xüsusiyyətlərini ehtiva edən yeni Sistem İnteqrasiyası tənzimləmələri əlavə edildi
+- Musiqi Qaydaları tətbiq edildikdə göstərilən istəyə bağlı "Qayda Tətbiq Edildikdə Bildiriş Göstər" seçimi əlavə edildi
+- Arxa plan batareya səmərəliliyi və Bluetooth sabitliyi əhəmiyyətli dərəcədə artırıldı

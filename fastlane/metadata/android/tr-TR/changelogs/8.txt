@@ -1,4 +1,6 @@
 ✨ v1.5.0
-- Manuel bağlantı kesildikten sonra arka plan servisinin çalışmaya devam etmesi sorunu düzeltildi
-- Başlangıçta uygulamanın eski bir kayıtlı cihaz anahtarını kontrol etmesine neden olan hata düzeltildi
-- Genel hata düzeltmeleri ve kararlılık iyileştirmeleri
+- Yenilenen Ayarlar Arayüzü: Daha iyi düzenlenmiş menüler, yeni ikonlar ve iyileştirilmiş tasarım
+- Akıllı Otomatik Bağlantı: Kulaklıklarınız telefona bağlandığında uygulama artık arka planda otomatik ve verimli bir şekilde bağlanır
+- "Cihaz Başlarken Çalıştır" ve "Kulaklıklara Otomatik Bağlan" özelliklerini içeren yeni Sistem Entegrasyonu ayarları eklendi
+- Müzik Kuralları uygulandığında gösterilen isteğe bağlı "Kural Eşleştiğinde Bildirim Göster" seçeneği eklendi
+- Arka plan pil verimliliği ve Bluetooth kararlılığı önemli ölçüde artırıldı
