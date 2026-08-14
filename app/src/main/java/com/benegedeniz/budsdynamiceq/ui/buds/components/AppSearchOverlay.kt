@@ -63,6 +63,7 @@ fun AppSearchOverlay(
 ) {
     var searchQuery by remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
+    val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
 
     val context = LocalContext.current
 
@@ -77,13 +78,21 @@ fun AppSearchOverlay(
         if (isVisible) {
             searchQuery = ""
             try { focusRequester.requestFocus() } catch (e: Exception) {}
+        } else {
+            focusManager.clearFocus()
         }
     }
 
     AnimatedVisibility(
         visible = isVisible,
-        enter = expandVertically(spring()) + fadeIn(),
-        exit = shrinkVertically(spring()) + fadeOut(),
+        enter = slideInVertically(
+            initialOffsetY = { -it / 6 },
+            animationSpec = spring(stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow)
+        ) + fadeIn(animationSpec = androidx.compose.animation.core.tween(200)),
+        exit = slideOutVertically(
+            targetOffsetY = { -it / 6 },
+            animationSpec = spring(stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow)
+        ) + fadeOut(animationSpec = androidx.compose.animation.core.tween(200)),
         modifier = modifier.fillMaxSize().zIndex(100f)
     ) {
         Box(

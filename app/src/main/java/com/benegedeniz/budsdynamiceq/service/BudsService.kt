@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
+import androidx.core.content.ContextCompat
 import com.benegedeniz.budsdynamiceq.R
 import com.benegedeniz.budsdynamiceq.data.model.EqPreset
 import com.benegedeniz.budsdynamiceq.data.model.NoiseControlMode
@@ -36,30 +37,9 @@ class BudsService : Service() {
     private val transientNotificationFlow = MutableStateFlow<Pair<String, String>?>(null)
     
     private lateinit var notificationManagerHelper: NotificationManagerHelper
+    private var notificationCoordinator: NotificationCoordinator? = null
 
-    private val bluetoothReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent?.action == android.bluetooth.BluetoothDevice.ACTION_ACL_CONNECTED) {
-                val device = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    intent.getParcelableExtra(android.bluetooth.BluetoothDevice.EXTRA_DEVICE, android.bluetooth.BluetoothDevice::class.java)
-                } else {
-                    @Suppress("DEPRECATION")
-                    intent.getParcelableExtra<android.bluetooth.BluetoothDevice>(android.bluetooth.BluetoothDevice.EXTRA_DEVICE)
-                }
-                if (device != null) {
-                    val name = try { device.name } catch (e: SecurityException) { null }
-                    if (name != null && name.contains("Buds", ignoreCase = true)) {
-                        Log.i(TAG, "Detected Buds connection: \$name (\${device.address})")
-                        val budsController = ServiceLocator.provideBudsController(this@BudsService)
-                        if (budsController.savedDeviceMac.value != device.address) {
-                            Log.i(TAG, "Automatically switching to newly connected Buds: \$name")
-                            budsController.connect(device)
-                        }
-                    }
-                }
-            }
-        }
-    }
+
 
     private val toggleReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -100,11 +80,9 @@ class BudsService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             registerReceiver(toggleReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
         } else {
+            @Suppress("UnspecifiedRegisterReceiverFlag")
             registerReceiver(toggleReceiver, filter)
         }
-
-        val btFilter = IntentFilter(android.bluetooth.BluetoothDevice.ACTION_ACL_CONNECTED)
-        registerReceiver(bluetoothReceiver, btFilter)
 
         notificationManagerHelper = NotificationManagerHelper(this)
         notificationManagerHelper.createNotificationChannel()
@@ -194,14 +172,14 @@ class BudsService : Service() {
         )
         rulesCoordinator.start()
 
-        val notificationCoordinator = NotificationCoordinator(
+        notificationCoordinator = NotificationCoordinator(
             context = this,
             scope = scope,
             budsController = budsController,
             transientNotificationFlow = transientNotificationFlow,
             notificationManagerHelper = notificationManagerHelper
         )
-        notificationCoordinator.start()
+        notificationCoordinator!!.start()
 
         val widgetCoordinator = WidgetCoordinator(
             context = this,
@@ -262,6 +240,9 @@ class BudsService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == "com.benegedeniz.budsdynamiceq.AUTO_CONNECT") {
+            ServiceLocator.provideBudsController(this).startAutoConnect()
+        }
         return START_STICKY
     }
 
@@ -275,8 +256,8 @@ class BudsService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(toggleReceiver)
-        unregisterReceiver(bluetoothReceiver)
+        notificationCoordinator?.stop()
+        try { unregisterReceiver(toggleReceiver) } catch (_: IllegalArgumentException) {}
         scope.cancel()
         
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

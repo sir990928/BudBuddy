@@ -185,13 +185,12 @@ class BudsViewModel(application: Application) : AndroidViewModel(application) {
 
     fun startAutoConnect() {
         budsController.startAutoConnect()
+        startService()
     }
 
     fun disconnect(forget: Boolean = false) {
         budsController.disconnect(forget = forget)
-        if (forget) {
-            stopService()
-        }
+        stopService()
     }
 
     fun setModelOverride(model: com.benegedeniz.budsdynamiceq.bluetooth.BudsModel?) {

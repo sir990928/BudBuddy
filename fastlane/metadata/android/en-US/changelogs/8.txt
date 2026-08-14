@@ -1,0 +1,6 @@
+✨ v1.5.0
+- Revamped Settings UI: Redesigned accordions, better organization, and new icons
+- Intelligent Auto-Connect: The app now automatically and efficiently connects in the background when your Buds pair to your phone
+- Added new System Integration features including "Start on Boot" and "Auto-Connect to Buds"
+- Added optional "Show Toast on Rule Match" notifications when Music Rules are applied
+- Significantly improved background battery efficiency and Bluetooth stability
