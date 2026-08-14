@@ -524,4 +524,5 @@
     <string name="clear_genre_cache">Janr Keşini Təmizlə</string>
     <string name="clear_genre_cache_desc">Yerli keşi təmizləyərək janrların yenidən yüklənməsini məcbur et.</string>
     <string name="cache_cleared">Keş uğurla təmizləndi.</string>
+    <string name="rule_applied_toast">Tətbiq edildi: %1$s</string>
 </resources>

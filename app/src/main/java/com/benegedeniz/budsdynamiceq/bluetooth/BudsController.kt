@@ -287,11 +287,34 @@ class BudsController(
         connectionJob = scope.launch {
             deviceState.isConnecting.value = true
             deviceState.isConnected.value = false
+            
+            var connected = false
+            var attempts = 0
+            while (!connected && attempts < 5 && isActive) {
+                try {
+                    Log.d(TAG, "Attempting connection to ${device.address} (Attempt ${attempts + 1})")
+                    socket = device.createRfcommSocketToServiceRecord(BUDS_SPP_UUID)
+                    socket?.connect()
+                    connected = true
+                } catch (e: IOException) {
+                    attempts++
+                    Log.e(TAG, "Connection error: ${e.message}")
+                    closeSocket()
+                    if (attempts < 5) {
+                        kotlinx.coroutines.delay(2000)
+                    }
+                }
+            }
+            
+            if (!connected) {
+                deviceState.isConnected.value = false
+                deviceState.isConnecting.value = false
+                deviceState.isSpatialActive.value = false
+                deviceState.reset()
+                return@launch
+            }
+
             try {
-                Log.d(TAG, "Attempting connection to ${device.address}")
-                socket = device.createRfcommSocketToServiceRecord(BUDS_SPP_UUID)
-                socket?.connect()
-                
                 deviceState.isConnected.value = true
                 deviceState.isConnecting.value = false
                 lastConnectedTime = System.currentTimeMillis()
@@ -302,7 +325,7 @@ class BudsController(
 
                 val buffer = ByteArray(4096)
                 var index = 0
-                while (true) {
+                while (isActive) {
                     val bytes = socket?.inputStream?.read(buffer, index, buffer.size - index) ?: -1
                     if (bytes == -1) break
                     index += bytes
@@ -348,7 +371,7 @@ class BudsController(
                     }
                 }
             } catch (e: IOException) {
-                Log.e(TAG, "Connection error: ${e.message}")
+                Log.e(TAG, "Connection read error: ${e.message}")
             } finally {
                 closeSocket()
                 deviceState.isConnected.value = false

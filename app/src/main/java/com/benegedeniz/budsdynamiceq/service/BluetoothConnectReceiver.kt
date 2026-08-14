@@ -12,7 +12,7 @@ class BluetoothConnectReceiver : BroadcastReceiver() {
         if (intent.action == BluetoothDevice.ACTION_ACL_CONNECTED) {
             val device: BluetoothDevice? = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
             val prefs = context.getSharedPreferences("BudsPrefs", Context.MODE_PRIVATE)
-            val autoConnect = prefs.getBoolean("auto_connect", false)
+            val autoConnect = prefs.getBoolean("auto_connect", true)
             val savedMacAddress = prefs.getString("saved_mac_address", null)
 
             if (autoConnect && savedMacAddress != null && device != null && device.address == savedMacAddress) {

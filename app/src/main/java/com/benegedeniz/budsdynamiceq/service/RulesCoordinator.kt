@@ -96,7 +96,14 @@ class RulesCoordinator(
                             val prefs = context.getSharedPreferences("BudsPrefs", Context.MODE_PRIVATE)
                             if (prefs.getBoolean("rule_toast_enabled", true)) {
                                 android.os.Handler(android.os.Looper.getMainLooper()).post {
-                                    android.widget.Toast.makeText(context, "Applied: ${matchingRule.keyword}", android.widget.Toast.LENGTH_SHORT).show()
+                                    val eqName = eqToSend?.let { context.getString(it.displayNameRes) } ?: ""
+                                    val ncName = ncToSend?.let { context.getString(it.displayNameRes) } ?: ""
+                                    val toastMessage = listOf(eqName, ncName).filter { it.isNotEmpty() }.joinToString(" & ")
+                                    val finalMessage = context.getString(
+                                        com.benegedeniz.budsdynamiceq.R.string.rule_applied_toast,
+                                        toastMessage.ifEmpty { matchingRule.keyword }
+                                    )
+                                    android.widget.Toast.makeText(context, finalMessage, android.widget.Toast.LENGTH_SHORT).show()
                                 }
                             }
                         }
