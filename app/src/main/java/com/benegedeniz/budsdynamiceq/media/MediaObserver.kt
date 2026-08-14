@@ -114,7 +114,11 @@ class MediaObserver(private val context: Context) {
             controller.unregisterCallback(callback)
         }
         controllerCallbacks.clear()
-        scope.cancel()
+        // Do NOT cancel the scope — MediaObserver is a singleton shared across service
+        // lifecycles. Cancelling the scope permanently kills it, causing genre fetches
+        // launched after a service restart to silently no-op and get stuck on LOADING.
+        currentFetchJob?.cancel()
+        currentFetchJob = null
     }
 
     private fun updateActiveControllers(controllers: List<MediaController>?) {
