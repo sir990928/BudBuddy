@@ -96,14 +96,15 @@ class RulesCoordinator(
                             val prefs = context.getSharedPreferences("BudsPrefs", Context.MODE_PRIVATE)
                             if (prefs.getBoolean("rule_toast_enabled", true)) {
                                 android.os.Handler(android.os.Looper.getMainLooper()).post {
-                                    val eqName = eqToSend?.let { context.getString(it.displayNameRes) } ?: ""
-                                    val ncName = ncToSend?.let { context.getString(it.displayNameRes) } ?: ""
+                                    val localizedContext = com.benegedeniz.budsdynamiceq.util.LanguageUtils.setLocale(context)
+                                    val eqName = eqToSend?.let { localizedContext.getString(it.displayNameRes) } ?: ""
+                                    val ncName = ncToSend?.let { localizedContext.getString(it.displayNameRes) } ?: ""
                                     val toastMessage = listOf(eqName, ncName).filter { it.isNotEmpty() }.joinToString(" & ")
-                                    val finalMessage = context.getString(
+                                    val finalMessage = localizedContext.getString(
                                         com.benegedeniz.budsdynamiceq.R.string.rule_applied_toast,
                                         toastMessage.ifEmpty { matchingRule.keyword }
                                     )
-                                    android.widget.Toast.makeText(context, finalMessage, android.widget.Toast.LENGTH_SHORT).show()
+                                    android.widget.Toast.makeText(localizedContext, finalMessage, android.widget.Toast.LENGTH_SHORT).show()
                                 }
                             }
                         }

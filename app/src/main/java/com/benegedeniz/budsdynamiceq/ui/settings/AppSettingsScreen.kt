@@ -88,9 +88,19 @@ fun AppSettingsScreen(
     var themePreference by remember { mutableStateOf(prefs.getInt("theme_preference", 0)) }
     var enableHaptics by remember { mutableStateOf(prefs.getBoolean("enable_haptics", true)) }
     var showToastRuleMatch by remember { mutableStateOf(prefs.getBoolean("rule_toast_enabled", true)) }
+    var ignoredMediaPlayers by remember { mutableStateOf(prefs.getStringSet("ignored_media_players", emptySet()) ?: emptySet()) }
     var startOnBoot by remember { mutableStateOf(prefs.getBoolean("start_on_boot", false)) }
     var autoConnectBuds by remember { mutableStateOf(prefs.getBoolean("auto_connect", true)) }
     var enableItunesGenreFetching by remember { mutableStateOf(prefs.getBoolean("enable_itunes_genre_fetching", true)) }
+
+    var mediaApps by remember { mutableStateOf<List<com.benegedeniz.budsdynamiceq.util.MediaAppInfo>>(emptyList()) }
+    var showMediaPlayerDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            mediaApps = com.benegedeniz.budsdynamiceq.util.MediaAppHelper.getInstalledMediaApps(context)
+        }
+    }
 
     val updateStatus by UpdateChecker.updateStatus.collectAsState()
 
@@ -520,15 +530,48 @@ fun AppSettingsScreen(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
-                                Switch(
-                                    checked = showToastRuleMatch,
-                                    onCheckedChange = { isChecked ->
-                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                        showToastRuleMatch = isChecked
-                                        prefs.edit().putBoolean("rule_toast_enabled", isChecked).apply()
+                                    Switch(
+                                        checked = showToastRuleMatch,
+                                        onCheckedChange = { isChecked ->
+                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                            showToastRuleMatch = isChecked
+                                            prefs.edit().putBoolean("rule_toast_enabled", isChecked).apply()
+                                        }
+                                    )
+                                }
+                                
+                                Row(
+                                    modifier = Modifier.fillMaxWidth()
+                                        .clickable { 
+                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                            showMediaPlayerDialog = true
+                                        }
+                                        .padding(vertical = 12.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Column(modifier = Modifier.weight(1f).padding(end = 16.dp)) {
+                                        Text(
+                                            text = stringResource(R.string.ignored_media_players),
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = stringResource(R.string.ignored_media_players_desc),
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
                                     }
-                                )
-                            }
+                                    Text(
+                                        text = if (ignoredMediaPlayers.isEmpty()) "0" 
+                                               else ignoredMediaPlayers.size.toString(),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
                             
                             Row(
                                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
@@ -1133,6 +1176,132 @@ fun AppSettingsScreen(
                 }
             },
             shape = RoundedCornerShape(24.dp)
+        )
+    }
+    if (showMediaPlayerDialog) {
+        var tempIgnoredPlayers by remember { mutableStateOf(ignoredMediaPlayers) }
+        var searchQuery by remember { mutableStateOf("") }
+        
+        AlertDialog(
+            onDismissRequest = { showMediaPlayerDialog = false },
+            title = {
+                Text(
+                    text = stringResource(R.string.ignored_media_players),
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxHeight(0.8f),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        placeholder = { Text(stringResource(android.R.string.search_go)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        shape = RoundedCornerShape(16.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+                        )
+                    )
+                    
+                    val filteredApps = remember(searchQuery, mediaApps) {
+                        if (searchQuery.isBlank()) mediaApps 
+                        else mediaApps.filter { it.name.contains(searchQuery, ignoreCase = true) }
+                    }
+
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        filteredApps.forEach { app ->
+                            val isIgnored = tempIgnoredPlayers.contains(app.packageName)
+                            Card(
+                                shape = RoundedCornerShape(16.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = if (isIgnored) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface
+                                ),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .clickable {
+                                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                        tempIgnoredPlayers = if (isIgnored) {
+                                            tempIgnoredPlayers - app.packageName
+                                        } else {
+                                            tempIgnoredPlayers + app.packageName
+                                        }
+                                    }
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 12.dp, horizontal = 16.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Checkbox(
+                                        checked = isIgnored,
+                                        onCheckedChange = null,
+                                        colors = CheckboxDefaults.colors(
+                                            checkedColor = MaterialTheme.colorScheme.primary,
+                                            uncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    )
+                                    Spacer(modifier = Modifier.width(16.dp))
+                                    Text(
+                                        text = app.name,
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = if (isIgnored) FontWeight.Bold else FontWeight.Normal,
+                                        color = if (isIgnored) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    val filteredApps = if (searchQuery.isBlank()) mediaApps else mediaApps.filter { it.name.contains(searchQuery, ignoreCase = true) }
+                    val allSelected = filteredApps.isNotEmpty() && filteredApps.all { tempIgnoredPlayers.contains(it.packageName) }
+                    
+                    TextButton(onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        if (allSelected) {
+                            tempIgnoredPlayers = tempIgnoredPlayers - filteredApps.map { it.packageName }.toSet()
+                        } else {
+                            tempIgnoredPlayers = tempIgnoredPlayers + filteredApps.map { it.packageName }.toSet()
+                        }
+                    }) {
+                        Text(if (allSelected) stringResource(R.string.deselect_all) else stringResource(R.string.select_all))
+                    }
+                    
+                    Row {
+                        TextButton(onClick = { showMediaPlayerDialog = false }) {
+                            Text(stringResource(android.R.string.cancel))
+                        }
+                        TextButton(onClick = { 
+                            ignoredMediaPlayers = tempIgnoredPlayers
+                            prefs.edit().putStringSet("ignored_media_players", tempIgnoredPlayers).apply()
+                            showMediaPlayerDialog = false 
+                        }) {
+                            Text(stringResource(android.R.string.ok))
+                        }
+                    }
+                }
+            },
+            dismissButton = null,
+            shape = RoundedCornerShape(24.dp),
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            titleContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            textContentColor = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }

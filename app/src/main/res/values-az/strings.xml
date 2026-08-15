@@ -517,6 +517,10 @@
     <string name="show_toast_rule_match">Qayda Tətbiq Edildikdə Bildiriş Göstər</string>
     <string name="show_toast_rule_match_desc">Bir qayda avtomatik tətbiq edildikdə qısa bir mesaj göstər.</string>
     <string name="system_integration">Sistem İnteqrasiyası</string>
+    <string name="ignored_media_players">İdarə Edilməyən Media Oynadıcılar</string>
+    <string name="ignored_media_players_desc">Dinamik EQ qaydalarını heç vaxt işə salmamalı olan media tətbiqlərini seçin.</string>
+    <string name="select_all">Hamısını Seç</string>
+    <string name="deselect_all">Hamısını Ləğv Et</string>
     <string name="start_on_boot">Cihaz Açılanda Başlat</string>
     <string name="start_on_boot_desc">Cihaz açıldıqda arxa plan xidmətini avtomatik başlat.</string>
     <string name="auto_connect_buds">Qulaqlıqlara Avtomatik Qoşul</string>

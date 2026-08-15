@@ -517,6 +517,10 @@
     <string name="show_toast_rule_match">Show Toast on Rule Match</string>
     <string name="show_toast_rule_match_desc">Show a brief message when a rule automatically applies.</string>
     <string name="system_integration">System Integration</string>
+    <string name="ignored_media_players">Ignored Media Players</string>
+    <string name="ignored_media_players_desc">Select media apps that should never trigger dynamic EQ rules.</string>
+    <string name="select_all">Select All</string>
+    <string name="deselect_all">Deselect All</string>
     <string name="start_on_boot">Start on Boot</string>
     <string name="start_on_boot_desc">Start the background service automatically when the device turns on.</string>
     <string name="auto_connect_buds">Auto-Connect to Buds</string>
