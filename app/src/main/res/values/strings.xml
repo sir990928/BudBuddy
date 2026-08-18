@@ -291,6 +291,9 @@
 	<string name="eq_dynamic">Dynamic</string>
 	<string name="eq_clear">Clear</string>
 	<string name="eq_treble_boost">Treble boost</string>
+	<string name="eq_custom">Custom</string>
+	<string name="equalizer_adjust_hint">Adjust the sound to your taste.</string>
+	<string name="equalizer_custom_unsupported">Per-band tuning is available on Galaxy Buds 3 and newer.</string>
 	<string name="nc_default">Default</string>
 	<string name="nc_ignore">Don\'t Change</string>
 	<string name="nc_off">Off</string>

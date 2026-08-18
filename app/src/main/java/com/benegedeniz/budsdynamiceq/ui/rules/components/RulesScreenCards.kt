@@ -117,7 +117,9 @@ fun GlobalDefaultsCard(
                             onDismissRequest = { expanded = false },
                             modifier = Modifier.background(MaterialTheme.colorScheme.surface, RoundedCornerShape(16.dp))
                         ) {
-                            EqPreset.entries.filter { it != EqPreset.DEFAULT }.forEach { preset ->
+                            EqPreset.entries.filter {
+                                it != EqPreset.DEFAULT && (it != EqPreset.CUSTOM || effectiveModel.supportsCustomEqualizer)
+                            }.forEach { preset ->
                                 DropdownMenuItem(
                                     text = { Text(stringResource(preset.displayNameRes)) },
                                     onClick = {

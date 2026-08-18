@@ -97,6 +97,7 @@ fun BudsScreen(
     onSoundBalanceTestClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {},
     onFindMyBudsClick: () -> Unit = {},
+    onEqualizerClick: () -> Unit = {},
     onOpenSearch: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -700,6 +701,20 @@ fun BudsScreen(
                         }
                     }
                 }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            // Equalizer
+            item {
+                EqualizerCard(
+                    isConnected = isConnected,
+                    currentPreset = if (lastMatchedRule == null || lastMatchedRule.preset == EqPreset.DEFAULT) {
+                        manualPreset
+                    } else {
+                        lastMatchedRule.preset
+                    },
+                    onClick = onEqualizerClick
+                )
                 Spacer(modifier = Modifier.height(16.dp))
             }
 

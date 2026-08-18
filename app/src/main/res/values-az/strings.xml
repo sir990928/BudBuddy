@@ -290,6 +290,9 @@
 	<string name="eq_dynamic">Dinamik</string>
 	<string name="eq_clear">Aydın</string>
 	<string name="eq_treble_boost">Tiz artırma</string>
+	<string name="eq_custom">Fərdi</string>
+	<string name="equalizer_adjust_hint">Səsi zövqünüzə görə tənzimləyin.</string>
+	<string name="equalizer_custom_unsupported">Zolaq üzrə tənzimləmə Galaxy Buds 3 və yenilərində mövcuddur.</string>
 	<string name="nc_default">Standart</string>
 	<string name="nc_ignore">Dəyişmə</string>
 	<string name="nc_off">Söndürülmüş</string>

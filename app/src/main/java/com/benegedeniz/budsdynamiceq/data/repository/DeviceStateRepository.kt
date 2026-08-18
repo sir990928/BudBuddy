@@ -63,6 +63,7 @@ class DeviceStateRepository {
     
     val lastMatchedRule = MutableStateFlow<EqRule?>(null)
     val manualPreset = MutableStateFlow<EqPreset?>(null)
+    val customEqBands = MutableStateFlow(com.benegedeniz.budsdynamiceq.data.model.CustomEqualizer.FLAT)
     val manualNoiseControl = MutableStateFlow<NoiseControlMode?>(null)
     val activeNoiseControl = MutableStateFlow<NoiseControlMode?>(null)
 

@@ -8,7 +8,8 @@ enum class BudsModel(
     val supportsFitTest: Boolean,
     val isExperimentalGestures: Boolean,
     val supportsFmgRingWhileWearing: Boolean,
-    val supportsDoubleTapEdge: Boolean
+    val supportsDoubleTapEdge: Boolean,
+    val supportsCustomEqualizer: Boolean
 ) {
     BUDS_2(
         displayNameRes = com.benegedeniz.budsdynamiceq.R.string.model_buds_2,
@@ -18,7 +19,8 @@ enum class BudsModel(
         supportsFitTest = true,
         isExperimentalGestures = true,
         supportsFmgRingWhileWearing = true,
-        supportsDoubleTapEdge = true
+        supportsDoubleTapEdge = true,
+        supportsCustomEqualizer = false
     ),
     BUDS_2_PRO(
         displayNameRes = com.benegedeniz.budsdynamiceq.R.string.model_buds_2_pro,
@@ -28,7 +30,8 @@ enum class BudsModel(
         supportsFitTest = true,
         isExperimentalGestures = true,
         supportsFmgRingWhileWearing = true,
-        supportsDoubleTapEdge = true
+        supportsDoubleTapEdge = true,
+        supportsCustomEqualizer = false
     ),
     BUDS_3(
         displayNameRes = com.benegedeniz.budsdynamiceq.R.string.model_buds_3,
@@ -38,7 +41,8 @@ enum class BudsModel(
         supportsFitTest = false,
         isExperimentalGestures = true,
         supportsFmgRingWhileWearing = false,
-        supportsDoubleTapEdge = false
+        supportsDoubleTapEdge = false,
+        supportsCustomEqualizer = true
     ),
     BUDS_3_PRO(
         displayNameRes = com.benegedeniz.budsdynamiceq.R.string.model_buds_3_pro,
@@ -48,7 +52,8 @@ enum class BudsModel(
         supportsFitTest = true,
         isExperimentalGestures = true,
         supportsFmgRingWhileWearing = false,
-        supportsDoubleTapEdge = false
+        supportsDoubleTapEdge = false,
+        supportsCustomEqualizer = true
     ),
     BUDS_4_PRO(
         displayNameRes = com.benegedeniz.budsdynamiceq.R.string.model_buds_4_pro,
@@ -58,7 +63,8 @@ enum class BudsModel(
         supportsFitTest = true,
         isExperimentalGestures = false,
         supportsFmgRingWhileWearing = false,
-        supportsDoubleTapEdge = false
+        supportsDoubleTapEdge = false,
+        supportsCustomEqualizer = true
     ),
     BUDS_4(
         displayNameRes = com.benegedeniz.budsdynamiceq.R.string.model_buds_4,
@@ -68,7 +74,8 @@ enum class BudsModel(
         supportsFitTest = false,
         isExperimentalGestures = false,
         supportsFmgRingWhileWearing = false,
-        supportsDoubleTapEdge = false
+        supportsDoubleTapEdge = false,
+        supportsCustomEqualizer = true
     ),
     UNKNOWN(
         displayNameRes = com.benegedeniz.budsdynamiceq.R.string.model_buds_unknown,
@@ -78,6 +85,7 @@ enum class BudsModel(
         supportsFitTest = true,
         isExperimentalGestures = true,
         supportsFmgRingWhileWearing = false,
-        supportsDoubleTapEdge = false
+        supportsDoubleTapEdge = false,
+        supportsCustomEqualizer = true
     )
 }
