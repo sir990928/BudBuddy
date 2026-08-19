@@ -38,6 +38,7 @@ import com.benegedeniz.budsdynamiceq.ui.theme.StatusErrorRed
 import com.benegedeniz.budsdynamiceq.ui.components.SearchBarInput
 import com.benegedeniz.budsdynamiceq.ui.headshake.components.*
 import com.benegedeniz.budsdynamiceq.ui.components.bounceClick
+import com.benegedeniz.budsdynamiceq.ui.components.rememberPageHeaderOverlayPadding
 import com.benegedeniz.budsdynamiceq.data.model.FitTestResult
 import com.benegedeniz.budsdynamiceq.data.model.GestureAction
 import com.benegedeniz.budsdynamiceq.data.model.getDisplayName
@@ -98,6 +99,7 @@ fun HeadShakeScreen(
 
     val listState = androidx.compose.foundation.lazy.rememberLazyListState()
     val isScrolled by remember { derivedStateOf { listState.firstVisibleItemIndex > 0 || listState.firstVisibleItemScrollOffset > 20 } }
+    val headerOverlay = rememberPageHeaderOverlayPadding()
     
 
 
@@ -168,7 +170,7 @@ fun HeadShakeScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 150.dp)
+                        .padding(top = headerOverlay.listTop)
                         .graphicsLayer { alpha = searchHintAlpha },
                     contentAlignment = Alignment.Center
                 ) {
@@ -199,7 +201,7 @@ fun HeadShakeScreen(
                 LazyColumn(
                     state = listState,
                     modifier = Modifier.fillMaxSize().nestedScroll(nestedScrollConnection).graphicsLayer { translationY = animatedOverscroll * 0.5f },
-                    contentPadding = PaddingValues(bottom = 120.dp, top = 140.dp)
+                    contentPadding = PaddingValues(bottom = 120.dp, top = headerOverlay.listTop)
                 ) {
 
                 item {
@@ -441,6 +443,7 @@ fun HeadShakeScreen(
         com.benegedeniz.budsdynamiceq.ui.components.PageHeader(
             title = stringResource(R.string.gestures),
             isScrolled = isScrolled,
+            modifier = headerOverlay.headerModifier,
             actionIcon = {
                 Row {
                     IconButton(onClick = { showInfoDialog = true }) {

@@ -55,6 +55,7 @@ import com.benegedeniz.budsdynamiceq.data.model.NoiseControlMode
 import androidx.compose.ui.graphics.graphicsLayer
 import com.benegedeniz.budsdynamiceq.ui.components.SearchBarInput
 import com.benegedeniz.budsdynamiceq.ui.components.PageHeader
+import com.benegedeniz.budsdynamiceq.ui.components.rememberPageHeaderOverlayPadding
 import com.benegedeniz.budsdynamiceq.ui.components.bounceClick
 import com.benegedeniz.budsdynamiceq.ui.buds.components.*
 import com.benegedeniz.budsdynamiceq.ui.rules.RulesViewModel
@@ -211,6 +212,8 @@ fun BudsScreen(
         label = "overscrollAnimation"
     )
 
+    val headerOverlay = rememberPageHeaderOverlayPadding()
+
     Box(
         modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
     ) {
@@ -227,7 +230,7 @@ fun BudsScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 150.dp)
+                .padding(top = headerOverlay.listTop)
                 .graphicsLayer { alpha = searchHintAlpha },
             contentAlignment = Alignment.Center
         ) {
@@ -263,7 +266,7 @@ fun BudsScreen(
                 .graphicsLayer {
                     translationY = animatedOverscroll * 0.5f
                 },
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 140.dp, bottom = 120.dp)
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = headerOverlay.listTop, bottom = 120.dp)
         ) {
             // Status Section
             item {
@@ -758,6 +761,7 @@ fun BudsScreen(
         PageHeader(
             title = stringResource(R.string.bud_buddy),
             isScrolled = isScrolled,
+            modifier = headerOverlay.headerModifier,
             actionIcon = {
                 val isUpdateAvailable by com.benegedeniz.budsdynamiceq.util.UpdateChecker.isUpdateAvailable.collectAsState()
                 IconButton(

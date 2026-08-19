@@ -184,6 +184,8 @@ fun RulesScreen(
         label = "overscrollAnimation"
     )
 
+    val headerOverlay = com.benegedeniz.budsdynamiceq.ui.components.rememberPageHeaderOverlayPadding()
+
     Box(
         modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
     ) {
@@ -200,7 +202,7 @@ fun RulesScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 150.dp)
+                .padding(top = headerOverlay.listTop)
                 .graphicsLayer { alpha = searchHintAlpha },
             contentAlignment = Alignment.Center
         ) {
@@ -238,7 +240,7 @@ fun RulesScreen(
                     .reorderable(listState)
                     .nestedScroll(nestedScrollConnection)
                     .graphicsLayer { translationY = animatedOverscroll * 0.5f },
-                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 140.dp, bottom = 120.dp)
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = headerOverlay.listTop, bottom = 120.dp)
             ) {
                 item {
                     // Active Rule Sub-bar
@@ -335,6 +337,7 @@ fun RulesScreen(
             com.benegedeniz.budsdynamiceq.ui.components.PageHeader(
                 title = stringResource(R.string.music_rules),
                 isScrolled = isScrolled,
+                modifier = headerOverlay.headerModifier,
                 actionIcon = {
                     IconButton(onClick = { showInfoDialog = true }) {
                         Icon(

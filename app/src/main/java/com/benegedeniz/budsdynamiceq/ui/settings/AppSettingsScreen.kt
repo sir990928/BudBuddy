@@ -43,6 +43,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.benegedeniz.budsdynamiceq.R
@@ -108,7 +109,8 @@ fun AppSettingsScreen(
         Triple("system", "🌐", stringResource(R.string.system_default)),
         Triple("en", "🇺🇸", "English"),
         Triple("tr", "🇹🇷", "Türkçe"),
-        Triple("az", "🇦🇿", "Azərbaycanca")
+        Triple("az", "🇦🇿", "Azərbaycanca"),
+        Triple("ru", "🇷🇺", "Русский")
     )
 
 
@@ -973,76 +975,86 @@ fun AppSettingsScreen(
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            when (val status = updateStatus) {
-                                is UpdateChecker.UpdateStatus.Checking -> {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                    ) {
-                                        CircularProgressIndicator(
-                                            modifier = Modifier.size(16.dp),
-                                            strokeWidth = 2.dp,
-                                            color = MaterialTheme.colorScheme.primary
-                                        )
+                            Box(modifier = Modifier.weight(1f)) {
+                                when (val status = updateStatus) {
+                                    is UpdateChecker.UpdateStatus.Checking -> {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            CircularProgressIndicator(
+                                                modifier = Modifier.size(16.dp),
+                                                strokeWidth = 2.dp,
+                                                color = MaterialTheme.colorScheme.primary
+                                            )
+                                            Text(
+                                                text = stringResource(R.string.checking_for_updates),
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                maxLines = 2,
+                                                overflow = TextOverflow.Ellipsis
+                                            )
+                                        }
+                                    }
+                                    is UpdateChecker.UpdateStatus.UpToDate -> {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Check,
+                                                contentDescription = null,
+                                                tint = StatusActiveGreen,
+                                                modifier = Modifier.size(18.dp)
+                                            )
+                                            Text(
+                                                text = stringResource(R.string.app_is_up_to_date),
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = StatusActiveGreen,
+                                                maxLines = 2,
+                                                overflow = TextOverflow.Ellipsis
+                                            )
+                                        }
+                                    }
+                                    is UpdateChecker.UpdateStatus.Available -> {
                                         Text(
-                                            text = stringResource(R.string.checking_for_updates),
+                                            text = "v${status.latestVersion} ${stringResource(R.string.update_available)}",
                                             style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.primary,
+                                            maxLines = 2,
+                                            overflow = TextOverflow.Ellipsis
                                         )
                                     }
-                                }
-                                is UpdateChecker.UpdateStatus.UpToDate -> {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Check,
-                                            contentDescription = null,
-                                            tint = StatusActiveGreen,
-                                            modifier = Modifier.size(18.dp)
-                                        )
-                                        Text(
-                                            text = stringResource(R.string.app_is_up_to_date),
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = StatusActiveGreen
-                                        )
-                                    }
-                                }
-                                is UpdateChecker.UpdateStatus.Available -> {
-                                    Text(
-                                        text = "v${status.latestVersion} ${stringResource(R.string.update_available)}",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
-                                }
-                                else -> {
-                                    TextButton(
-                                        onClick = {
-                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                            UpdateChecker.checkForUpdates(versionName, coroutineScope)
-                                        },
-                                        contentPadding = PaddingValues(0.dp)
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Refresh,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(16.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(6.dp))
-                                        Text(
-                                            text = stringResource(R.string.check_for_updates),
-                                            style = MaterialTheme.typography.bodyMedium
-                                        )
+                                    else -> {
+                                        TextButton(
+                                            onClick = {
+                                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                                UpdateChecker.checkForUpdates(versionName, coroutineScope)
+                                            },
+                                            contentPadding = PaddingValues(0.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Refresh,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(16.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Text(
+                                                text = stringResource(R.string.check_for_updates),
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis
+                                            )
+                                        }
                                     }
                                 }
                             }
 
                             if (updateStatus is UpdateChecker.UpdateStatus.UpToDate || updateStatus is UpdateChecker.UpdateStatus.Error) {
-                                TextButton(
+                                IconButton(
                                     onClick = {
                                         haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                         UpdateChecker.checkForUpdates(versionName, coroutineScope)
@@ -1050,13 +1062,8 @@ fun AppSettingsScreen(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Refresh,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        text = stringResource(R.string.check_for_updates),
-                                        style = MaterialTheme.typography.labelMedium
+                                        contentDescription = stringResource(R.string.check_for_updates),
+                                        tint = MaterialTheme.colorScheme.primary
                                     )
                                 }
                             }
