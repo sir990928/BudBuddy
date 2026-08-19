@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.benegedeniz.budsdynamiceq.R
 import com.benegedeniz.budsdynamiceq.bluetooth.BudsModel
+import com.benegedeniz.budsdynamiceq.data.model.EqPreset
 import com.benegedeniz.budsdynamiceq.data.model.NoiseControlMode
 import com.benegedeniz.budsdynamiceq.data.model.PlacementState
 import com.benegedeniz.budsdynamiceq.ui.components.bounceClick
@@ -244,6 +245,59 @@ fun FitTestCard(
                         text = stringResource(R.string.requires_both_earbuds_to_be_worn),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun EqualizerCard(
+    isConnected: Boolean,
+    currentPreset: EqPreset?,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .bounceClick(enabled = isConnected) { onClick() },
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp)
+                .alpha(if (isConnected) 1f else 0.5f),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.GraphicEq,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.equalizer),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                if (currentPreset != null && currentPreset != EqPreset.DEFAULT && currentPreset != EqPreset.IGNORE) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(currentPreset.displayNameRes),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }

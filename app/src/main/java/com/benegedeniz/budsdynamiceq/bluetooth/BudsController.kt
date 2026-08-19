@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothSocket
 import android.content.Context
 import android.util.Log
 import com.benegedeniz.budsdynamiceq.data.model.EqPreset
+import com.benegedeniz.budsdynamiceq.data.model.CustomEqualizer
 import com.benegedeniz.budsdynamiceq.data.model.EqRule
 import com.benegedeniz.budsdynamiceq.data.model.NoiseControlMode
 import com.benegedeniz.budsdynamiceq.data.model.FitTestResult
@@ -101,6 +102,7 @@ class BudsController(
     val stereoBalance = deviceState.stereoBalance.asStateFlow()
     val lastMatchedRule = deviceState.lastMatchedRule.asStateFlow()
     val manualPreset = deviceState.manualPreset.asStateFlow()
+    val customEqBands = deviceState.customEqBands.asStateFlow()
     val manualNoiseControl = deviceState.manualNoiseControl.asStateFlow()
     val activeNoiseControl = deviceState.activeNoiseControl.asStateFlow()
 
@@ -127,6 +129,7 @@ class BudsController(
         deviceState.savedDeviceMac.value = settingsRepo.getSavedMacAddress()
         deviceState.connectedModel.value = settingsRepo.getDetectedModel(deviceState.savedDeviceMac.value ?: "")
         deviceState.modelOverride.value = settingsRepo.getModelOverride(deviceState.savedDeviceMac.value ?: "")
+        loadCustomEqBands()
         
         scope.launch(Dispatchers.IO) {
             for (packet in _packetQueue) {
@@ -137,6 +140,9 @@ class BudsController(
                 try {
                     socket?.outputStream?.write(packet.data)
                     delay(250) // Hardware processing buffer time
+                    if (packet.isNc) {
+                        writeCustomEqFollowup()
+                    }
                 } catch (e: Exception) {
                     Log.e(TAG, "Failed to send queued packet: ${e.message}")
                 }
@@ -260,6 +266,7 @@ class BudsController(
     fun connect(device: BluetoothDevice) {
         settingsRepo.saveMacAddress(device.address)
         deviceState.savedDeviceMac.value = device.address
+        loadCustomEqBands()
         targetDevice = device
 
         var savedModel = settingsRepo.getDetectedModel(device.address)
@@ -394,6 +401,7 @@ class BudsController(
             deviceState.savedDeviceMac.value = null
             deviceState.connectedModel.value = BudsModel.UNKNOWN
             deviceState.modelOverride.value = null
+            loadCustomEqBands()
         }
         synchronized(spatialConsumers) { spatialConsumers.clear() }
         stopSpatialSensor()
@@ -417,15 +425,68 @@ class BudsController(
     }
 
     fun sendEqualizer(preset: EqPreset?) {
-        if (preset == lastSentEq && preset != null) return
+        if (preset == EqPreset.DEFAULT || preset == EqPreset.IGNORE) return
+
+        val isCustom = preset == EqPreset.CUSTOM
+        if (isCustom) {
+            sendCustomEqualizerBands()
+        }
+        if (!isCustom && preset == lastSentEq && preset != null) return
+        if (isCustom && lastSentEq == EqPreset.CUSTOM) return
+
         lastSentEq = preset
-        
+
         val payloadByte = preset?.payloadByte ?: 0x00.toByte()
         val payload = byteArrayOf(payloadByte)
 
         val packet = SppPacketEncoder.buildPacket(SppPacketEncoder.MSG_ID_EQUALIZER, payload)
         packetQueue.trySend(packet)
         Log.i(TAG, "Queued EQ preset: ${preset?.name ?: "OFF"} (byte: 0x%02X)".format(payloadByte))
+    }
+
+    fun setCustomEqBands(bands: List<Int>) {
+        val clamped = CustomEqualizer.clamp(bands)
+        if (clamped == deviceState.customEqBands.value) return
+        deviceState.customEqBands.value = clamped
+        settingsRepo.saveCustomEqBands(deviceState.savedDeviceMac.value, clamped)
+        if (lastSentEq == EqPreset.CUSTOM) {
+            sendCustomEqualizerBands()
+        }
+    }
+
+    private fun loadCustomEqBands() {
+        deviceState.customEqBands.value = settingsRepo.getCustomEqBands(deviceState.savedDeviceMac.value)
+    }
+
+    private fun sendCustomEqualizerBands() {
+        if (!effectiveModel.value.supportsCustomEqualizer) return
+        val payload = SppPacketEncoder.buildCustomEqualizerPayload(deviceState.customEqBands.value)
+        val packet = SppPacketEncoder.buildPacket(SppPacketEncoder.MSG_ID_CUSTOM_EQUALIZE_SEND, payload)
+        packetQueue.trySend(packet)
+        Log.i(TAG, "Queued custom EQ bands: ${deviceState.customEqBands.value}")
+    }
+
+    private suspend fun writeCustomEqFollowup() {
+        if (lastSentEq != EqPreset.CUSTOM) return
+        if (!effectiveModel.value.supportsCustomEqualizer) return
+        try {
+            val bandsPacket = SppPacketEncoder.buildPacket(
+                SppPacketEncoder.MSG_ID_CUSTOM_EQUALIZE_SEND,
+                SppPacketEncoder.buildCustomEqualizerPayload(deviceState.customEqBands.value)
+            )
+            socket?.outputStream?.write(bandsPacket)
+            socket?.outputStream?.flush()
+            delay(80)
+            val eqPacket = SppPacketEncoder.buildPacket(
+                SppPacketEncoder.MSG_ID_EQUALIZER,
+                byteArrayOf(EqPreset.CUSTOM.payloadByte)
+            )
+            socket?.outputStream?.write(eqPacket)
+            socket?.outputStream?.flush()
+            Log.i(TAG, "Re-pushed custom EQ after noise-control update")
+        } catch (e: Exception) {
+            Log.e(TAG, "Custom EQ follow-up failed: ${e.message}")
+        }
     }
 
     fun sendNoiseControl(mode: NoiseControlMode?) {
@@ -454,6 +515,7 @@ class BudsController(
                         socket?.outputStream?.write(packet)
                         socket?.outputStream?.flush()
                         Log.i(TAG, "Sent Noise Control directly without throttle: ${mode.name} (attempt 1)")
+                        writeCustomEqFollowup()
                     } else {
                         _packetQueue.trySend(QueuedPacket(packet, isNc = true, ncMode = mode))
                         Log.i(TAG, "Sent Noise Control to queue: ${mode.name} (attempt $attempt/5)")

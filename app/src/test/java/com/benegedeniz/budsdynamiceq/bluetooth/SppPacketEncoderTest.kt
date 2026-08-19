@@ -28,4 +28,17 @@ class SppPacketEncoderTest {
         assertEquals(0x03.toByte(), packet[4])
 
     }
+
+    @Test
+    fun buildCustomEqualizerPayload_bandCountThenSignedGains() {
+        val payload = SppPacketEncoder.buildCustomEqualizerPayload(listOf(6, 3, 0, 0, 1, 1, 3, 5, -4))
+        assertEquals(10, payload.size)
+        assertEquals(9.toByte(), payload[0])
+        assertEquals(6.toByte(), payload[1])
+        assertEquals((-4).toByte(), payload[9])
+
+        val packet = SppPacketEncoder.buildPacket(SppPacketEncoder.MSG_ID_CUSTOM_EQUALIZE_SEND, payload)
+        assertEquals(0x89.toByte(), packet[3])
+        assertEquals(9.toByte(), packet[4])
+    }
 }

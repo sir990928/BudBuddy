@@ -53,7 +53,7 @@ import com.benegedeniz.budsdynamiceq.ui.wearstate.WearStateViewModel
 import kotlinx.coroutines.launch
 
 // Sub-screen enum for flag-based navigation (no NavHost lifecycle transitions)
-private enum class SubScreen { NONE, FIT_TEST, WEAR_STATE, SOUND_BALANCE, SETTINGS, FIND_MY_BUDS }
+private enum class SubScreen { NONE, FIT_TEST, WEAR_STATE, SOUND_BALANCE, SETTINGS, FIND_MY_BUDS, EQUALIZER }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -168,6 +168,7 @@ fun MainScreen() {
                         onSoundBalanceTestClick = { activeSubScreen = SubScreen.SOUND_BALANCE },
                         onSettingsClick = { activeSubScreen = SubScreen.SETTINGS },
                         onFindMyBudsClick = { activeSubScreen = SubScreen.FIND_MY_BUDS },
+                        onEqualizerClick = { activeSubScreen = SubScreen.EQUALIZER },
                         onOpenSearch = { isAppSearchVisible = true },
                         modifier = Modifier.fillMaxSize()
                     )
@@ -263,6 +264,11 @@ fun MainScreen() {
                             onBack = { activeSubScreen = SubScreen.NONE },
                             modifier = Modifier.fillMaxSize()
                         )
+                        SubScreen.EQUALIZER -> com.benegedeniz.budsdynamiceq.ui.equalizer.EqualizerScreen(
+                            viewModel = rulesViewModel,
+                            onBack = { activeSubScreen = SubScreen.NONE },
+                            modifier = Modifier.fillMaxSize()
+                        )
                         SubScreen.NONE -> {}
                     }
                 }
@@ -282,7 +288,8 @@ fun MainScreen() {
             onFitTestClick = { activeSubScreen = SubScreen.FIT_TEST },
             onWearStateClick = { activeSubScreen = SubScreen.WEAR_STATE },
             onSoundBalanceTestClick = { activeSubScreen = SubScreen.SOUND_BALANCE },
-            onFindMyBudsClick = { activeSubScreen = SubScreen.FIND_MY_BUDS }
+            onFindMyBudsClick = { activeSubScreen = SubScreen.FIND_MY_BUDS },
+            onEqualizerClick = { activeSubScreen = SubScreen.EQUALIZER }
         )
 
         // ── Dialogs ────────────────────────────────────────────────────────

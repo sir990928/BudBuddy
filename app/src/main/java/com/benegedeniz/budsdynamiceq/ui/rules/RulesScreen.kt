@@ -521,6 +521,9 @@ fun RuleEditScreen(
     var artistSelected by remember { mutableStateOf(false) }
     var genreSelected by remember { mutableStateOf(false) }
 
+    val budsController = com.benegedeniz.budsdynamiceq.di.ServiceLocator.provideBudsController(LocalContext.current)
+    val effectiveModel = budsController.effectiveModel.collectAsState().value
+
     val isBadgeSelected = titleSelected || artistSelected || genreSelected
 
     val isMatch = remember(keyword, currentMetadata) {
@@ -824,7 +827,9 @@ fun RuleEditScreen(
                             onDismissRequest = { expanded = false },
                             modifier = Modifier.background(MaterialTheme.colorScheme.surface)
                         ) {
-                            EqPreset.entries.forEach { preset ->
+                            EqPreset.entries.filter {
+                                it != EqPreset.CUSTOM || effectiveModel.supportsCustomEqualizer
+                            }.forEach { preset ->
                                 DropdownMenuItem(
                                     text = { Text(stringResource(preset.displayNameRes)) },
                                     onClick = {
@@ -857,8 +862,6 @@ fun RuleEditScreen(
                             onDismissRequest = { ncExpanded = false },
                             modifier = Modifier.background(MaterialTheme.colorScheme.surface)
                         ) {
-                            val budsController = com.benegedeniz.budsdynamiceq.di.ServiceLocator.provideBudsController(androidx.compose.ui.platform.LocalContext.current)
-                            val effectiveModel = budsController.effectiveModel.collectAsState().value
                             NoiseControlMode.entries.filter { (it != NoiseControlMode.ADAPTIVE || effectiveModel.supportsAdaptiveNC) && (it != NoiseControlMode.TRANSPARENT || effectiveModel.supportsTransparencyNC) }.forEach { ncMode ->
                                 DropdownMenuItem(
                                     text = { Text(stringResource(ncMode.displayNameRes)) },

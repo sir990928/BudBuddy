@@ -59,6 +59,7 @@ fun AppSearchOverlay(
     onWearStateClick: () -> Unit,
     onSoundBalanceTestClick: () -> Unit,
     onFindMyBudsClick: () -> Unit,
+    onEqualizerClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var searchQuery by remember { mutableStateOf("") }
@@ -179,6 +180,10 @@ fun AppSearchOverlay(
                     
                     val titleFindBuds = context.getString(R.string.find_my_earbuds).lowercase()
                     val mFindBuds = titleFindBuds.contains(query)
+
+                    val titleEqualizer = context.getString(R.string.equalizer).lowercase()
+                    val mEqualizer = titleEqualizer.contains(query) ||
+                        context.getString(R.string.eq_custom).lowercase().contains(query)
                     
                     val toggleDoubleTap = context.getString(R.string.double_tap_earbud_edge).lowercase()
                     val mDoubleTap = effectiveModel.supportsDoubleTapEdge && toggleDoubleTap.contains(query)
@@ -190,7 +195,7 @@ fun AppSearchOverlay(
                     val pauseMediaDesc = context.getString(R.string.pauses_media_when_ambient_mode_is_trigge).lowercase()
                     val mPauseMedia = effectiveModel.supportsConversationDetection && (togglePauseMedia.contains(query) || pauseMediaDesc.contains(query))
 
-                    if (mNoiseControls || mOneEarbud || mAmbientCall || mInEarCall || mFitTest || mWearState || mSoundBalance || mFindBuds || mDoubleTap || mVoiceDetect || mPauseMedia) {
+                    if (mNoiseControls || mOneEarbud || mAmbientCall || mInEarCall || mFitTest || mWearState || mSoundBalance || mFindBuds || mEqualizer || mDoubleTap || mVoiceDetect || mPauseMedia) {
                         item(key = "header_home") {
                             SearchSectionHeader(
                                 appName = context.getString(R.string.app_name),
@@ -301,6 +306,24 @@ fun AppSearchOverlay(
                                 onClick = { 
                                     onClose()
                                     onFindMyBudsClick() 
+                                },
+                                modifier = Modifier.animateItem().padding(horizontal = 16.dp, vertical = 8.dp)
+                            )
+                        }
+                    }
+
+                    if (mEqualizer) {
+                        item(key = "equalizer") {
+                            EqualizerCard(
+                                isConnected = budsState.isConnected,
+                                currentPreset = if (budsState.lastMatchedRule == null || budsState.lastMatchedRule?.preset == com.benegedeniz.budsdynamiceq.data.model.EqPreset.DEFAULT) {
+                                    budsState.manualPreset
+                                } else {
+                                    budsState.lastMatchedRule?.preset
+                                },
+                                onClick = {
+                                    onClose()
+                                    onEqualizerClick()
                                 },
                                 modifier = Modifier.animateItem().padding(horizontal = 16.dp, vertical = 8.dp)
                             )
@@ -490,7 +513,7 @@ fun AppSearchOverlay(
                         )
                     }
 
-                    val hasAnyResults = mNoiseControls || mOneEarbud || mAmbientCall || mInEarCall || mFitTest || mWearState || mSoundBalance || mFindBuds || mDoubleTap || mVoiceDetect || mPauseMedia || mActiveRule || mGlobalDefaults || matchingRules.isNotEmpty() || mGesturesStatus || mMovementCancelling || matchingGestures.isNotEmpty()
+                    val hasAnyResults = mNoiseControls || mOneEarbud || mAmbientCall || mInEarCall || mFitTest || mWearState || mSoundBalance || mFindBuds || mEqualizer || mDoubleTap || mVoiceDetect || mPauseMedia || mActiveRule || mGlobalDefaults || matchingRules.isNotEmpty() || mGesturesStatus || mMovementCancelling || matchingGestures.isNotEmpty()
 
                     if (!hasAnyResults) {
                         item(key = "empty_no_results") {
