@@ -291,6 +291,9 @@
 	<string name="eq_dynamic">Динамичный</string>
 	<string name="eq_clear">Чистый</string>
 	<string name="eq_treble_boost">Усиление высоких</string>
+	<string name="eq_custom">Пользовательский</string>
+	<string name="equalizer_adjust_hint">Настройте звук под себя.</string>
+	<string name="equalizer_custom_unsupported">Полосная настройка доступна на Galaxy Buds 3 и новее.</string>
 	<string name="nc_default">По умолчанию</string>
 	<string name="nc_ignore">Не менять</string>
 	<string name="nc_off">Выкл.</string>
