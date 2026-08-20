@@ -202,7 +202,9 @@
 	<string name="use_ambient_sound_during_calls">Zənglər zamanı Ətraf Səsini İstifadə Et</string>
 	<string name="in_ear_detection_for_calls">Zənglər üçün Qulaqdaxili Aşkarlama</string>
 	<string name="play_calls_through_earbuds_when_in_ear_s">Zəngləri taxılarkən qulaqlığa, taxılmayanda isə dinamikə yönləndir</string>
-	<string name="left_right_sound_balance">Sol/Sağ Səs Balansı</string>
+	<string name="left_right_sound_balance">Səs Balansı</string>
+	<string name="sound_options">Səs Seçimləri</string>
+	<string name="reset_to_center">Mərkəzə Sıfırla</string>
 	<string name="conversation_detection">Söhbət Aşkarlaması</string>
 	<string name="automatically_switches_to_ambient_mode_w">Danışdığınızda avtomatik olaraq Ətraf Səsi rejiminə keçir.</string>
 	<string name="requires_both_earbuds_to_be_worn">Hər iki qulaqlığın da taxılı olması tələb olunur</string>
@@ -234,7 +236,7 @@
 	<string name="right_ear_test">Sağ Qulaq Sınağı</string>
 	<string name="now_testing_your_right_ear_n_npress_and_">İndi sağ qulağınız sınaqdan keçirilir.\n\nDüyməni basıb saxlayın. Səsi eşitmədiyi an barmağınızı çəkin.</string>
 	<string name="find_your_perfect_balance">Mükəmməl Balansınızı Tapın</string>
-	<string name="this_test_will_determine_the_optimal_lef">Bu sınaq, qulaqlarınız üçün optimal Sol/Sağ səs balansını müəyyənləşdirir.</string>
+	<string name="this_test_will_determine_the_optimal_lef">Bu sınaq, qulaqlarınız üçün optimal səs balansını müəyyənləşdirir.</string>
 	<string name="your_media_will_be_paused_and_system_vol">Dəqiqlik üçün media dayandırılacaq və sistem səsi müvəqqəti olaraq maksimuma qaldırılacaq.</string>
 	<string name="sensory_warning_this_test_plays_a_contin">Sensor Xəbərdarlığı: Bu sınaq kəsilməz 1000 Hz səs çalır. Sensor həssaslığı olan istifadəçilərin diqqətli olması tövsiyə edilir.</string>
 	<string name="please_go_to_a_quiet_environment_active_">Zəhmət olmasa sakit bir mühitə keçin. Sınaq zamanı ANC müvəqqəti olaraq açılacaq.</string>

@@ -202,7 +202,9 @@
 	<string name="use_ambient_sound_during_calls">Окружающий звук во время звонков</string>
 	<string name="in_ear_detection_for_calls">Определение в ухе для звонков</string>
 	<string name="play_calls_through_earbuds_when_in_ear_s">Звонки через наушники, когда они в ушах, и через динамик, когда нет</string>
-	<string name="left_right_sound_balance">Баланс лево/право</string>
+	<string name="left_right_sound_balance">Баланс звука</string>
+	<string name="sound_options">Параметры звука</string>
+	<string name="reset_to_center">Сбросить по центру</string>
 	<string name="conversation_detection">Определение разговора</string>
 	<string name="automatically_switches_to_ambient_mode_w">Автоматически включает окружающий звук, когда вы говорите.</string>
 	<string name="requires_both_earbuds_to_be_worn">Нужно надеть оба наушника</string>

@@ -400,119 +400,48 @@ fun FindMyEarbudsCard(
 }
 
 @Composable
-fun SoundBalanceCard(
+fun SoundBalanceEntryCard(
     isConnected: Boolean,
-    placementL: PlacementState,
-    placementR: PlacementState,
-    stereoBalance: Int,
-    onBalanceChange: (Int) -> Unit,
-    onBalanceChangeFinished: (Int) -> Unit,
-    onSoundBalanceTestClick: () -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val haptic = LocalHapticFeedback.current
-    var isDraggingBalance by remember { mutableStateOf(false) }
-    var localBalance by remember(stereoBalance) { mutableFloatStateOf(stereoBalance.toFloat()) }
-    var lastSentBalanceTime by remember { mutableLongStateOf(0L) }
-    var lastHapticValue by remember { mutableIntStateOf(stereoBalance) }
-    
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp)
-            .alpha(if (isConnected) 1f else 0.5f)
+    BaseCard(
+        modifier = modifier,
+        onClick = { onClick() },
+        enabled = isConnected
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(bottom = 0.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp)
+                .alpha(if (isConnected) 1f else 0.5f),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = Icons.Default.SwapHoriz,
                 contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.left_right_sound_balance),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(24.dp)
             )
-            Spacer(modifier = Modifier.width(12.dp))
-            Text(
-                text = stringResource(R.string.left_right_sound_balance),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        }
-        
-        Slider(
-            value = if (isDraggingBalance) localBalance else stereoBalance.toFloat(),
-            onValueChange = { newValue ->
-                isDraggingBalance = true
-                val snapped = if (newValue in 15f..17f) {
-                    16f
-                } else {
-                    newValue
-                }
-                
-                val newInt = snapped.toInt()
-                if (newInt != lastHapticValue) {
-                    if (newInt == 16) {
-                        haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
-                    } else {
-                        haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
-                    }
-                    lastHapticValue = newInt
-                }
-                
-                localBalance = snapped
-                
-                val currentTime = System.currentTimeMillis()
-                if (currentTime - lastSentBalanceTime > 300) {
-                    onBalanceChange(newInt)
-                    lastSentBalanceTime = currentTime
-                }
-            },
-            onValueChangeFinished = {
-                isDraggingBalance = false
-                onBalanceChangeFinished(localBalance.toInt())
-            },
-            valueRange = 0f..32f,
-            enabled = isConnected,
-            modifier = Modifier.padding(horizontal = 8.dp)
-        )
-        
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(stringResource(R.string.l), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(
-                text = run {
-                    val current = if (isDraggingBalance) localBalance.toInt() else stereoBalance
-                    when (current) {
-                        16 -> stringResource(R.string.buds_balanced)
-                        in 0..15 -> stringResource(R.string.buds_battery_l, ((16 - current) / 16f * 100).toInt())
-                        else -> stringResource(R.string.buds_battery_r, ((current - 16) / 16f * 100).toInt())
-                    }
-                },
-                style = MaterialTheme.typography.labelSmall, 
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(stringResource(R.string.r), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-        
-        Spacer(modifier = Modifier.height(12.dp))
-        
-        val bothInEar = isConnected && placementL == PlacementState.WEARING && placementR == PlacementState.WEARING
-        
-        OutlinedButton(
-            onClick = onSoundBalanceTestClick,
-            enabled = bothInEar,
-            modifier = Modifier.fillMaxWidth().height(42.dp).bounceClick(enabled = bothInEar),
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            Icon(Icons.Default.Hearing, contentDescription = null, modifier = Modifier.size(18.dp))
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(stringResource(R.string.take_hearing_test), fontSize = 14.sp, fontWeight = FontWeight.Medium)
         }
     }
 }
+
+
 
 @Composable
 fun DoubleTapEdgeCard(

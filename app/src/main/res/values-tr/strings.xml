@@ -202,7 +202,9 @@
 	<string name="use_ambient_sound_during_calls">Aramalarda Ortam Sesini Kullan</string>
 	<string name="in_ear_detection_for_calls">Aramalarda Kulak İçi Algılama</string>
 	<string name="play_calls_through_earbuds_when_in_ear_s">Aramaları takılıyken kulaklığa, değilken hoparlöre aktar</string>
-	<string name="left_right_sound_balance">Sol/Sağ Ses Dengesi</string>
+	<string name="left_right_sound_balance">Ses Dengesi</string>
+	<string name="sound_options">Ses Seçenekleri</string>
+	<string name="reset_to_center">Ortala</string>
 	<string name="conversation_detection">Konuşma Algılama</string>
 	<string name="automatically_switches_to_ambient_mode_w">Konuştuğunuzda otomatik olarak Ortam Sesi moduna geçer.</string>
 	<string name="requires_both_earbuds_to_be_worn">Her iki kulaklığın da takılı olması gerekir</string>
@@ -234,7 +236,7 @@
 	<string name="right_ear_test">Sağ Kulak Testi</string>
 	<string name="now_testing_your_right_ear_n_npress_and_">Şimdi sağ kulağınız test ediliyor.\n\nButona basılı tutun. Sesi duyamadığınız anda parmağınızı çekin.</string>
 	<string name="find_your_perfect_balance">Mükemmel Dengenizi Bulun</string>
-	<string name="this_test_will_determine_the_optimal_lef">Bu test, kulaklarınıza en uygun Sol/Sağ ses dengesini belirler.</string>
+	<string name="this_test_will_determine_the_optimal_lef">Bu test, kulaklarınıza en uygun ses dengesini belirler.</string>
 	<string name="your_media_will_be_paused_and_system_vol">Doğru ölçüm için medya duraklatılacak ve sistem sesi geçici olarak maksimuma çıkarılacaktır.</string>
 	<string name="sensory_warning_this_test_plays_a_contin">Duyusal Uyarı: Bu test kesintisiz 1000 Hz ses çalar. Duyusal hassasiyeti olan kullanıcıların dikkatli olması önerilir.</string>
 	<string name="please_go_to_a_quiet_environment_active_">Lütfen sessiz bir ortama geçin. Test sırasında ANC geçici olarak açılacaktır.</string>

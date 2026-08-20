@@ -176,7 +176,10 @@ fun AppSearchOverlay(
                     val mWearState = titleWearState.contains(query)
                     
                     val titleSoundBalance = context.getString(R.string.take_hearing_test).lowercase()
-                    val mSoundBalance = titleSoundBalance.contains(query) || context.getString(R.string.left_right_sound_balance).lowercase().contains(query)
+                    val mSoundBalance = titleSoundBalance.contains(query) || 
+                        context.getString(R.string.left_right_sound_balance).lowercase().contains(query) ||
+                        context.getString(R.string.sound_options).lowercase().contains(query) ||
+                        context.getString(R.string.sound_balance_test).lowercase().contains(query)
                     
                     val titleFindBuds = context.getString(R.string.find_my_earbuds).lowercase()
                     val mFindBuds = titleFindBuds.contains(query)
@@ -201,11 +204,16 @@ fun AppSearchOverlay(
                     val mMediaControls = (effectiveModel.supportsTransparencyNC && (togglePauseMedia.contains(query) || pauseMediaDesc.contains(query))) || 
                                          (togglePlayOnAnc.contains(query) || playOnAncDesc.contains(query))
 
-                    if (mNoiseControls || mOneEarbud || mAmbientCall || mInEarCall || mFitTest || mWearState || mSoundBalance || mFindBuds || mEqualizer || mDoubleTap || mVoiceDetect || mMediaControls) {
-                        item(key = "header_home") {
+                    val hasNoiseGroup = mNoiseControls || mOneEarbud || mAmbientCall || mInEarCall || mDoubleTap || mVoiceDetect || mMediaControls
+                    val hasSoundGroup = mEqualizer || mSoundBalance
+                    val hasDeviceGroup = mWearState || mFitTest || mFindBuds
+
+                    // 1.1 Noise Controls Group
+                    if (hasNoiseGroup) {
+                        item(key = "header_noise_controls") {
                             SearchSectionHeader(
-                                appName = context.getString(R.string.app_name),
                                 sectionName = context.getString(R.string.tab_home),
+                                categoryName = context.getString(R.string.noise_controls),
                                 modifier = Modifier.animateItem()
                             )
                         }
@@ -259,84 +267,6 @@ fun AppSearchOverlay(
                         }
                     }
 
-                    if (mFitTest) {
-                        item(key = "fit_test") {
-                            FitTestCard(
-                                isConnected = budsState.isConnected,
-                                placementL = budsState.placementL,
-                                placementR = budsState.placementR,
-                                onClick = { 
-                                    onClose()
-                                    onFitTestClick() 
-                                },
-                                modifier = Modifier.animateItem().padding(horizontal = 16.dp, vertical = 8.dp)
-                            )
-                        }
-                    }
-
-                    if (mWearState) {
-                        item(key = "wear_state") {
-                            WearStateActionsCard(
-                                isConnected = budsState.isConnected,
-                                onClick = { 
-                                    onClose()
-                                    onWearStateClick() 
-                                },
-                                modifier = Modifier.animateItem().padding(horizontal = 16.dp, vertical = 8.dp)
-                            )
-                        }
-                    }
-
-                    if (mSoundBalance) {
-                        item(key = "sound_balance") {
-                            SoundBalanceCard(
-                                isConnected = budsState.isConnected,
-                                placementL = budsState.placementL,
-                                placementR = budsState.placementR,
-                                stereoBalance = budsState.stereoBalance,
-                                onBalanceChange = { budsViewModel.setStereoBalance(it) },
-                                onBalanceChangeFinished = { budsViewModel.setStereoBalance(it) },
-                                onSoundBalanceTestClick = { 
-                                    onClose()
-                                    onSoundBalanceTestClick() 
-                                },
-                                modifier = Modifier.animateItem().padding(horizontal = 16.dp, vertical = 8.dp)
-                            )
-                        }
-                    }
-
-                    if (mFindBuds) {
-                        item(key = "find_buds") {
-                            FindMyEarbudsCard(
-                                isConnected = budsState.isConnected,
-                                onClick = { 
-                                    onClose()
-                                    onFindMyBudsClick() 
-                                },
-                                modifier = Modifier.animateItem().padding(horizontal = 16.dp, vertical = 8.dp)
-                            )
-                        }
-                    }
-
-                    if (mEqualizer) {
-                        item(key = "equalizer") {
-                            EqualizerCard(
-                                isConnected = budsState.isConnected,
-                                currentPreset = if (budsState.lastMatchedRule == null || budsState.lastMatchedRule?.preset == com.benegedeniz.budsdynamiceq.data.model.EqPreset.DEFAULT) {
-                                    budsState.manualPreset
-                                } else {
-                                    budsState.lastMatchedRule?.preset
-                                },
-                                isRuleActive = budsState.lastMatchedRule != null && budsState.lastMatchedRule?.preset != com.benegedeniz.budsdynamiceq.data.model.EqPreset.IGNORE,
-                                onClick = {
-                                    onClose()
-                                    onEqualizerClick()
-                                },
-                                modifier = Modifier.animateItem().padding(horizontal = 16.dp, vertical = 8.dp)
-                            )
-                        }
-                    }
-
                     if (mDoubleTap) {
                         item(key = "double_tap") {
                             DoubleTapEdgeCard(
@@ -379,6 +309,101 @@ fun AppSearchOverlay(
                         }
                     }
 
+                    // 1.2 Sound Options Group
+                    if (hasSoundGroup) {
+                        item(key = "header_sound_options") {
+                            SearchSectionHeader(
+                                sectionName = context.getString(R.string.tab_home),
+                                categoryName = context.getString(R.string.sound_options),
+                                modifier = Modifier.animateItem()
+                            )
+                        }
+                    }
+
+                    if (mEqualizer) {
+                        item(key = "equalizer") {
+                            EqualizerCard(
+                                isConnected = budsState.isConnected,
+                                currentPreset = if (budsState.lastMatchedRule == null || budsState.lastMatchedRule?.preset == com.benegedeniz.budsdynamiceq.data.model.EqPreset.DEFAULT) {
+                                    budsState.manualPreset
+                                } else {
+                                    budsState.lastMatchedRule?.preset
+                                },
+                                isRuleActive = budsState.lastMatchedRule != null && budsState.lastMatchedRule?.preset != com.benegedeniz.budsdynamiceq.data.model.EqPreset.IGNORE,
+                                onClick = {
+                                    onClose()
+                                    onEqualizerClick()
+                                },
+                                modifier = Modifier.animateItem().padding(horizontal = 16.dp, vertical = 8.dp)
+                            )
+                        }
+                    }
+
+                    if (mSoundBalance) {
+                        item(key = "sound_balance") {
+                            SoundBalanceEntryCard(
+                                isConnected = budsState.isConnected,
+                                onClick = { 
+                                    onClose()
+                                    onSoundBalanceTestClick() 
+                                },
+                                modifier = Modifier.animateItem().padding(horizontal = 16.dp, vertical = 8.dp)
+                            )
+                        }
+                    }
+
+                    // 1.3 Device Options Group
+                    if (hasDeviceGroup) {
+                        item(key = "header_device_options") {
+                            SearchSectionHeader(
+                                sectionName = context.getString(R.string.tab_home),
+                                categoryName = context.getString(R.string.device_options),
+                                modifier = Modifier.animateItem()
+                            )
+                        }
+                    }
+
+                    if (mWearState) {
+                        item(key = "wear_state") {
+                            WearStateActionsCard(
+                                isConnected = budsState.isConnected,
+                                onClick = { 
+                                    onClose()
+                                    onWearStateClick() 
+                                },
+                                modifier = Modifier.animateItem().padding(horizontal = 16.dp, vertical = 8.dp)
+                            )
+                        }
+                    }
+
+                    if (mFitTest) {
+                        item(key = "fit_test") {
+                            FitTestCard(
+                                isConnected = budsState.isConnected,
+                                placementL = budsState.placementL,
+                                placementR = budsState.placementR,
+                                onClick = { 
+                                    onClose()
+                                    onFitTestClick() 
+                                },
+                                modifier = Modifier.animateItem().padding(horizontal = 16.dp, vertical = 8.dp)
+                            )
+                        }
+                    }
+
+                    if (mFindBuds) {
+                        item(key = "find_buds") {
+                            FindMyEarbudsCard(
+                                isConnected = budsState.isConnected,
+                                onClick = { 
+                                    onClose()
+                                    onFindMyBudsClick() 
+                                },
+                                modifier = Modifier.animateItem().padding(horizontal = 16.dp, vertical = 8.dp)
+                            )
+                        }
+                    }
+
                     // 2. Search Rules
                     val titleActiveRule = context.getString(R.string.rules_active_rule, "").lowercase().replace(":", "").trim()
                     val mActiveRule = titleActiveRule.contains(query) || query.contains("rule")
@@ -389,7 +414,6 @@ fun AppSearchOverlay(
                     if (mActiveRule || mGlobalDefaults || matchingRules.isNotEmpty()) {
                         item(key = "header_rules") {
                             SearchSectionHeader(
-                                appName = context.getString(R.string.app_name),
                                 sectionName = context.getString(R.string.tab_rules),
                                 modifier = Modifier.animateItem()
                             )
@@ -453,7 +477,6 @@ fun AppSearchOverlay(
                     if (mGesturesStatus || mMovementCancelling || matchingGestures.isNotEmpty()) {
                         item(key = "header_gestures") {
                             SearchSectionHeader(
-                                appName = context.getString(R.string.app_name),
                                 sectionName = context.getString(R.string.tab_gestures),
                                 modifier = Modifier.animateItem()
                             )
@@ -556,12 +579,17 @@ fun AppSearchOverlay(
 
 @Composable
 fun SearchSectionHeader(
-    appName: String, 
     sectionName: String,
+    categoryName: String? = null,
     modifier: Modifier = Modifier
 ) {
+    val text = if (!categoryName.isNullOrBlank()) {
+        "$sectionName > $categoryName"
+    } else {
+        "$sectionName"
+    }
     Text(
-        text = "$appName > $sectionName",
+        text = text,
         style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.primary,
         modifier = modifier.padding(horizontal = 24.dp, vertical = 8.dp)
