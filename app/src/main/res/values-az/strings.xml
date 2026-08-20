@@ -348,9 +348,12 @@
 	<string name="model_buds_3_pro">Galaxy Buds3 Pro</string>
 	<string name="model_buds_4">Galaxy Buds4</string>
 	<string name="model_buds_4_pro">Galaxy Buds4 Pro</string>
+	<string name="model_buds_3_fe">Galaxy Buds3 FE</string>
+	<string name="model_buds_fe">Galaxy Buds FE</string>
 	<string name="model_buds_unknown">Galaxy Buds (Naməlum)</string>
 	<string name="setup_gestures_supported">Jestlər dəstəklənir</string>
-	<string name="setup_gestures_not_supported">Jest dəstəyi eksperimentaldır</string>
+	<string name="setup_gestures_not_supported">Jestlər dəstəklənmir</string>
+	<string name="setup_gestures_experimental">Jest dəstəyi eksperimentaldır</string>
 	<string name="btn_next">İrəli</string>
 	<string name="btn_get_started">Başlayın</string>
 	<string name="btn_got_it">Başa düşdüm</string>

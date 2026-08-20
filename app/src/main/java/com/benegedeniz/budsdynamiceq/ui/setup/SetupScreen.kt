@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Headphones
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -151,10 +152,12 @@ fun SetupScreen(onPermissionsGranted: () -> Unit) {
                         val earbuds = listOf(
                             Pair(stringResource(R.string.model_buds_4_pro), stringResource(R.string.setup_gestures_supported)),
                             Pair(stringResource(R.string.model_buds_4), stringResource(R.string.setup_gestures_supported)),
-                            Pair(stringResource(R.string.model_buds_3_pro), stringResource(R.string.setup_gestures_not_supported)),
-                            Pair(stringResource(R.string.model_buds_3), stringResource(R.string.setup_gestures_not_supported)),
-                            Pair(stringResource(R.string.model_buds_2_pro), stringResource(R.string.setup_gestures_not_supported)),
-                            Pair(stringResource(R.string.model_buds_2), stringResource(R.string.setup_gestures_not_supported))
+                            Pair(stringResource(R.string.model_buds_3_pro), stringResource(R.string.setup_gestures_experimental)),
+                            Pair(stringResource(R.string.model_buds_3), stringResource(R.string.setup_gestures_experimental)),
+                            Pair(stringResource(R.string.model_buds_3_fe), stringResource(R.string.setup_gestures_not_supported)),
+                            Pair(stringResource(R.string.model_buds_2_pro), stringResource(R.string.setup_gestures_experimental)),
+                            Pair(stringResource(R.string.model_buds_2), stringResource(R.string.setup_gestures_experimental)),
+                            Pair(stringResource(R.string.model_buds_fe), stringResource(R.string.setup_gestures_not_supported))
                         )
                         
                         val scrollState = rememberScrollState()
@@ -170,11 +173,12 @@ fun SetupScreen(onPermissionsGranted: () -> Unit) {
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier.padding(vertical = 4.dp)
                                 ) {
-                                    val isPartial = subtext == stringResource(R.string.setup_gestures_not_supported)
+                                    val isExperimental = subtext == stringResource(R.string.setup_gestures_experimental)
+                                    val isUnsupported = subtext == stringResource(R.string.setup_gestures_not_supported)
                                     Icon(
-                                        imageVector = Icons.Default.CheckCircle,
+                                        imageVector = if (isUnsupported) Icons.Default.Cancel else Icons.Default.CheckCircle,
                                         contentDescription = null,
-                                        tint = if (isPartial) Color(0xFFFBC02D) else MaterialTheme.colorScheme.primary,
+                                        tint = if (isExperimental) Color(0xFFFBC02D) else if (isUnsupported) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
                                         modifier = Modifier.size(18.dp)
                                     )
                                     Spacer(modifier = Modifier.width(12.dp))

@@ -26,6 +26,8 @@ Bud Buddy is an improved, open-source alternative to the Samsung Galaxy Buds Man
 | **Galaxy Buds 3** | ✅ Supported | ⚠️ Experimental |
 | **Galaxy Buds 2 Pro** | ✅ Supported | ⚠️ Experimental |
 | **Galaxy Buds 2** | ✅ Supported | ⚠️ Experimental |
+| **Galaxy Buds3 FE** | ✅ Supported | ❌ Not Supported |
+| **Galaxy Buds FE** | ✅ Supported | ❌ Not Supported |
 
 ## Building from Source
 

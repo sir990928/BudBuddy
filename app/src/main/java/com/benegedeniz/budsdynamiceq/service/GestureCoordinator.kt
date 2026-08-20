@@ -39,13 +39,13 @@ class GestureCoordinator(
             }
 
             combine(
-                headShakeEnabledFlow,
-                budsController.isConnected,
+                combine(headShakeEnabledFlow, budsController.isConnected, ::Pair),
                 gestureRepo.gestures,
                 budsController.isFitTestScreenOpen,
-                wearingFlow
-            ) { enabled, connected, gestures, fitTestOpen, isWearing ->
-                if (fitTestOpen || !isWearing) Triple(false, connected, gestures)
+                wearingFlow,
+                budsController.effectiveModel
+            ) { (enabled, connected), gestures, fitTestOpen, isWearing, effectiveModel ->
+                if (fitTestOpen || !isWearing || !effectiveModel.supportsHeadGestures) Triple(false, connected, gestures)
                 else Triple(enabled, connected, gestures)
             }.collect { (enabled, connected, gestures) ->
                 val activeGestures = gestures.filter { it.enabled }

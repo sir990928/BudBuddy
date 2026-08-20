@@ -64,7 +64,10 @@ fun MainScreen() {
     val rulesViewModel: RulesViewModel = viewModel()
     val budsViewModel: BudsViewModel = viewModel()
 
-    val pagerState = rememberPagerState(initialPage = 0, pageCount = { 3 })
+    val uiState by rulesViewModel.uiState.collectAsState()
+    val effectiveModel = uiState.effectiveModel
+
+    val pagerState = rememberPagerState(initialPage = 0, pageCount = { if (effectiveModel.supportsHeadGestures) 3 else 2 })
     val coroutineScope = rememberCoroutineScope()
     val selectedTab = pagerState.targetPage
 
@@ -80,14 +83,12 @@ fun MainScreen() {
     }
 
     val locked = headShakeViewModel.isUiLocked.collectAsState().value
-    val uiState by rulesViewModel.uiState.collectAsState()
-    val effectiveModel = uiState.effectiveModel
     val isSensorDebugScreenOpen = headShakeViewModel.isSensorDebugScreenOpen
 
     val budsUiState by budsViewModel.uiState.collectAsState()
 
     LaunchedEffect(effectiveModel, experimentalGesturesEnabled) {
-        if (effectiveModel.isExperimentalGestures && !experimentalGesturesEnabled && selectedTab == 2) {
+        if ((!effectiveModel.supportsHeadGestures || (effectiveModel.isExperimentalGestures && !experimentalGesturesEnabled)) && selectedTab == 2) {
             pagerState.animateScrollToPage(0)
         }
     }
@@ -195,9 +196,10 @@ fun MainScreen() {
             ) {
                 GlassyBottomNavBar(
                     selectedTab = selectedTab,
-                    disabledTabs = if (effectiveModel.isExperimentalGestures && !experimentalGesturesEnabled) listOf(2) else emptyList(),
+                    disabledTabs = if (effectiveModel.supportsHeadGestures && effectiveModel.isExperimentalGestures && !experimentalGesturesEnabled) listOf(2) else emptyList(),
+                    supportsHeadGestures = effectiveModel.supportsHeadGestures,
                     onTabSelected = { targetTabIndex ->
-                        if (targetTabIndex == 2 && effectiveModel.isExperimentalGestures && !experimentalGesturesEnabled) {
+                        if (targetTabIndex == 2 && effectiveModel.supportsHeadGestures && effectiveModel.isExperimentalGestures && !experimentalGesturesEnabled) {
                             if (savedMac == null) {
                                 showNoDeviceDialog = true
                             } else {
@@ -296,7 +298,7 @@ fun MainScreen() {
             }
         } // End of blurred Box
 
-        val gesturesTabEnabled = !(effectiveModel.isExperimentalGestures && !experimentalGesturesEnabled)
+        val gesturesTabEnabled = effectiveModel.supportsHeadGestures && !(effectiveModel.isExperimentalGestures && !experimentalGesturesEnabled)
 
         AppSearchOverlay(
             isVisible = isAppSearchVisible,
@@ -367,6 +369,7 @@ fun GlassyBottomNavBar(
     showFab: Boolean,
     fabEnabled: Boolean = true,
     disabledTabs: List<Int> = emptyList(),
+    supportsHeadGestures: Boolean = true,
     onFabClick: () -> Unit
 ) {
     val haptic = LocalHapticFeedback.current
@@ -398,11 +401,13 @@ fun GlassyBottomNavBar(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    val tabs = listOf(
-                        Triple(stringResource(R.string.tab_home), Icons.Default.Home, 0),
-                        Triple(stringResource(R.string.tab_rules), Icons.Default.GraphicEq, 1),
-                        Triple(stringResource(R.string.tab_gestures), Icons.Default.Sensors, 2)
-                    )
+                    val tabs = buildList {
+                        add(Triple(stringResource(R.string.tab_home), Icons.Default.Home, 0))
+                        add(Triple(stringResource(R.string.tab_rules), Icons.Default.GraphicEq, 1))
+                        if (supportsHeadGestures) {
+                            add(Triple(stringResource(R.string.tab_gestures), Icons.Default.Sensors, 2))
+                        }
+                    }
 
                     tabs.forEach { (label, icon, index) ->
                         val isSelected = selectedTab == index
