@@ -3,4 +3,5 @@
 - Russian language support. (Thanks to @MrMe0ws from GitHub)
 - Added "Ignored Media Players" to ignore apps that shouldn't trigger the EQ rules (such as KDE Connect).
 - Added "Play on ANC" toggle to help with the "Pause on Transparency" feature.
+- Reorganised the home screen for better user experience.
 - Various bug fixes and improvements
