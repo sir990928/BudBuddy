@@ -321,6 +321,7 @@ fun AppSearchOverlay(
                                 } else {
                                     budsState.lastMatchedRule?.preset
                                 },
+                                isRuleActive = budsState.lastMatchedRule != null && budsState.lastMatchedRule?.preset != com.benegedeniz.budsdynamiceq.data.model.EqPreset.IGNORE,
                                 onClick = {
                                     onClose()
                                     onEqualizerClick()

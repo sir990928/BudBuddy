@@ -14,6 +14,7 @@
 	<string name="does_not_match_current_song">Cari mahnıyla uyğun gəlmir</string>
 	<string name="fetching_genre">Janr Alınır...</string>
 	<string name="equalizer">Ekvalayzер</string>
+	<string name="equalizer_disabled_by_rule">Aktiv qayda tərəfindən deaktiv edilib</string>
 	<string name="noise_control">Səs-küy Nəzarəti</string>
 	<string name="grant_system_permissions">Sistem İcazələrini Ver</string>
 	<string name="grant_notification_access">Bildiriş İcazəsi Ver</string>

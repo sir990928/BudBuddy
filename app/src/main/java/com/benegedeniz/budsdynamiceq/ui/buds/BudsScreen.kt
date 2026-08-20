@@ -713,6 +713,7 @@ fun BudsScreen(
                     } else {
                         lastMatchedRule.preset
                     },
+                    isRuleActive = lastMatchedRule != null && lastMatchedRule.preset != EqPreset.IGNORE,
                     onClick = onEqualizerClick
                 )
                 Spacer(modifier = Modifier.height(16.dp))

@@ -14,6 +14,7 @@
 	<string name="does_not_match_current_song">Does not match current song</string>
 	<string name="fetching_genre">Fetching Genre...</string>
 	<string name="equalizer">Equalizer</string>
+	<string name="equalizer_disabled_by_rule">Disabled by active rule</string>
 	<string name="noise_control">Noise Control</string>
 	<string name="grant_system_permissions">Grant System Permissions</string>
 	<string name="grant_notification_access">Grant Notification Access</string>

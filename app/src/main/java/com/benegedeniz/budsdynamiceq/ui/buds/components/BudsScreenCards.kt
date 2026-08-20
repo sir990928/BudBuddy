@@ -262,13 +262,14 @@ fun FitTestCard(
 fun EqualizerCard(
     isConnected: Boolean,
     currentPreset: EqPreset?,
+    isRuleActive: Boolean = false,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .bounceClick(enabled = isConnected) { onClick() },
+            .bounceClick(enabled = isConnected && !isRuleActive) { onClick() },
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
@@ -276,7 +277,7 @@ fun EqualizerCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(24.dp)
-                .alpha(if (isConnected) 1f else 0.5f),
+                .alpha(if (isConnected && !isRuleActive) 1f else 0.5f),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -298,6 +299,14 @@ fun EqualizerCard(
                         text = stringResource(currentPreset.displayNameRes),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                if (isRuleActive) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(R.string.equalizer_disabled_by_rule),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.error
                     )
                 }
             }
