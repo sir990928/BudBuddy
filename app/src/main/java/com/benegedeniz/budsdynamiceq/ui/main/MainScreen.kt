@@ -242,7 +242,7 @@ fun MainScreen() {
                             .togetherWith(slideOutHorizontally(targetOffsetX = { it }, animationSpec = spring(stiffness = Spring.StiffnessLow)))
                             .apply { targetContentZIndex = -1f }
                     } else {
-                        val isPush = targetState == SubScreen.SOUND_BALANCE_TEST
+                        val isPush = targetState == SubScreen.SOUND_BALANCE_TEST || targetState == SubScreen.ABOUT_APP
                         if (isPush) {
                             slideInHorizontally(initialOffsetX = { it }, animationSpec = spring(stiffness = Spring.StiffnessLow))
                                 .togetherWith(slideOutHorizontally(targetOffsetX = { -it / 3 }, animationSpec = spring(stiffness = Spring.StiffnessLow)))
