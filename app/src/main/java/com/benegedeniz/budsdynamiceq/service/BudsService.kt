@@ -135,6 +135,21 @@ class BudsService : Service() {
             wearStateRepo.loadActions()
         }
 
+        scope.launch {
+            delay(2000)
+            combine(
+                budsController.isConnected,
+                budsController.isConnecting
+            ) { connected, connecting ->
+                Pair(connected, connecting)
+            }.collect { (connected, connecting) ->
+                if (!connected && !connecting) {
+                    Log.i(TAG, "Not connected and not connecting, stopping service.")
+                    stopSelf()
+                }
+            }
+        }
+
         val gestureCoordinator = GestureCoordinator(
             scope = scope,
             budsController = budsController,
