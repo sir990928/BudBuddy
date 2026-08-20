@@ -193,9 +193,10 @@ class BudsService : Service() {
             gestureDetector.detectedGesture.collect { gesture ->
                 try {
                     if (gestureDetector.isTrainingMode) return@collect
-                    transientNotificationFlow.value = getString(R.string.service_gesture_detected) to getString(R.string.service_flow_sequence, gesture.name)
+                    val localizedContext = com.benegedeniz.budsdynamiceq.util.LanguageUtils.setLocale(this@BudsService)
+                    transientNotificationFlow.value = localizedContext.getString(R.string.service_gesture_detected) to localizedContext.getString(R.string.service_flow_sequence, gesture.name)
                     actionExecutor.execute(gesture.actions, gesture.playChime)
-                    transientNotificationFlow.value = getString(R.string.service_gesture_detected) to getString(R.string.service_flow_complete, gesture.name)
+                    transientNotificationFlow.value = localizedContext.getString(R.string.service_gesture_detected) to localizedContext.getString(R.string.service_flow_complete, gesture.name)
                     delay(1000)
                     transientNotificationFlow.value = null
                 } catch (e: Exception) {
