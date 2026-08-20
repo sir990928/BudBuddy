@@ -827,8 +827,8 @@ fun RuleEditScreen(
                             onDismissRequest = { expanded = false },
                             modifier = Modifier.background(MaterialTheme.colorScheme.surface)
                         ) {
-                            EqPreset.entries.filter {
-                                it != EqPreset.CUSTOM || effectiveModel.supportsCustomEqualizer
+                            EqPreset.entries.filter { preset ->
+                                !preset.isCustom || effectiveModel.supportsCustomEqualizer
                             }.forEach { preset ->
                                 DropdownMenuItem(
                                     text = { Text(stringResource(preset.displayNameRes)) },

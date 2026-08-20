@@ -73,7 +73,9 @@ fun EqualizerScreen(
 ) {
     BackHandler { onBack() }
     val uiState by viewModel.uiState.collectAsState()
-    val savedBands by viewModel.customEqBands.collectAsState()
+    val savedBands1 by viewModel.customEqBands1.collectAsState()
+    val savedBands2 by viewModel.customEqBands2.collectAsState()
+    val savedBands3 by viewModel.customEqBands3.collectAsState()
     val haptic = LocalHapticFeedback.current
     val scrollState = rememberScrollState()
     val headerOverlay = rememberPageHeaderOverlayPadding()
@@ -82,26 +84,32 @@ fun EqualizerScreen(
     val effectiveEq = remember(uiState.lastMatchedRule, uiState.manualPreset) {
         effectiveEqPreset(uiState.lastMatchedRule, uiState.manualPreset)
     }
-    val isCustomActive = effectiveEq == EqPreset.CUSTOM
+    val isCustomActive = effectiveEq.isCustom
     val slidersEnabled = uiState.isConnected && supportsCustom && isCustomActive
 
-    var localBands by remember { mutableStateOf(savedBands) }
+    val activeCustomBands = when (effectiveEq) {
+        EqPreset.CUSTOM_2 -> savedBands2
+        EqPreset.CUSTOM_3 -> savedBands3
+        else -> savedBands1
+    }
+
+    var localBands by remember { mutableStateOf(activeCustomBands) }
     var isDragging by remember { mutableStateOf(false) }
 
-    LaunchedEffect(savedBands) {
-        if (!isDragging) localBands = savedBands
+    LaunchedEffect(effectiveEq, activeCustomBands) {
+        if (!isDragging) localBands = activeCustomBands
     }
 
     LaunchedEffect(localBands, slidersEnabled) {
         if (!slidersEnabled) return@LaunchedEffect
         delay(250)
-        viewModel.setCustomEqBands(localBands)
+        viewModel.setCustomEqBands(effectiveEq, localBands)
     }
 
     val displayedBands = if (isCustomActive) {
         localBands
     } else {
-        CustomEqualizer.previewBands(effectiveEq, savedBands)
+        CustomEqualizer.previewBands(effectiveEq, activeCustomBands)
     }
 
     Box(
@@ -157,13 +165,32 @@ fun EqualizerScreen(
                     }
                 }
                 if (supportsCustom) {
-                    EqPresetChip(
-                        preset = EqPreset.CUSTOM,
-                        selected = effectiveEq == EqPreset.CUSTOM,
-                        enabled = uiState.isConnected,
-                        modifier = Modifier.fillMaxWidth(0.5f),
-                        onClick = { viewModel.setManualPreset(EqPreset.CUSTOM) }
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        EqPresetChip(
+                            preset = EqPreset.CUSTOM_1,
+                            selected = effectiveEq == EqPreset.CUSTOM_1,
+                            enabled = uiState.isConnected,
+                            modifier = Modifier.weight(1f),
+                            onClick = { viewModel.setManualPreset(EqPreset.CUSTOM_1) }
+                        )
+                        EqPresetChip(
+                            preset = EqPreset.CUSTOM_2,
+                            selected = effectiveEq == EqPreset.CUSTOM_2,
+                            enabled = uiState.isConnected,
+                            modifier = Modifier.weight(1f),
+                            onClick = { viewModel.setManualPreset(EqPreset.CUSTOM_2) }
+                        )
+                        EqPresetChip(
+                            preset = EqPreset.CUSTOM_3,
+                            selected = effectiveEq == EqPreset.CUSTOM_3,
+                            enabled = uiState.isConnected,
+                            modifier = Modifier.weight(1f),
+                            onClick = { viewModel.setManualPreset(EqPreset.CUSTOM_3) }
+                        )
+                    }
                 }
             }
 

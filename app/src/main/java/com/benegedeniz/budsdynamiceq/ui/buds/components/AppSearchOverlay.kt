@@ -183,7 +183,9 @@ fun AppSearchOverlay(
 
                     val titleEqualizer = context.getString(R.string.equalizer).lowercase()
                     val mEqualizer = titleEqualizer.contains(query) ||
-                        context.getString(R.string.eq_custom).lowercase().contains(query)
+                        context.getString(R.string.eq_custom_1).lowercase().contains(query) ||
+                        context.getString(R.string.eq_custom_2).lowercase().contains(query) ||
+                        context.getString(R.string.eq_custom_3).lowercase().contains(query)
                     
                     val toggleDoubleTap = context.getString(R.string.double_tap_earbud_edge).lowercase()
                     val mDoubleTap = effectiveModel.supportsDoubleTapEdge && toggleDoubleTap.contains(query)

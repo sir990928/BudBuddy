@@ -291,7 +291,9 @@
 	<string name="eq_dynamic">Dinamik</string>
 	<string name="eq_clear">Net</string>
 	<string name="eq_treble_boost">Tiz artırma</string>
-	<string name="eq_custom">Özel</string>
+	<string name="eq_custom_1">Özel 1</string>
+	<string name="eq_custom_2">Özel 2</string>
+	<string name="eq_custom_3">Özel 3</string>
 	<string name="equalizer_adjust_hint">Sesi zevkinize göre ayarlayın.</string>
 	<string name="equalizer_custom_unsupported">Bant bazlı ayar Galaxy Buds 3 ve sonraki modellerde kullanılabilir.</string>
 	<string name="nc_default">Varsayılan</string>

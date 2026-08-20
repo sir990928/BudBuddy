@@ -13,5 +13,9 @@ enum class EqPreset(@param:StringRes val displayNameRes: Int, val payloadByte: B
     CLEAR(R.string.eq_clear, 0x04),
     TREBLE_BOOST(R.string.eq_treble_boost, 0x05),
     // Wearable "Custom": EQUALIZER payload 0x07 (preset index 6, sent as index+1).
-    CUSTOM(R.string.eq_custom, 0x07);
+    CUSTOM_1(R.string.eq_custom_1, 0x07),
+    CUSTOM_2(R.string.eq_custom_2, 0x07),
+    CUSTOM_3(R.string.eq_custom_3, 0x07);
+
+    val isCustom: Boolean get() = this == CUSTOM_1 || this == CUSTOM_2 || this == CUSTOM_3
 }

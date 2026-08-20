@@ -37,7 +37,7 @@ object CustomEqualizer {
 
     fun previewBands(preset: EqPreset, custom: List<Int>): List<Int> {
         return when (preset) {
-            EqPreset.CUSTOM -> clamp(custom)
+            EqPreset.CUSTOM_1, EqPreset.CUSTOM_2, EqPreset.CUSTOM_3 -> clamp(custom)
             EqPreset.BASS_BOOST -> listOf(6, 4, 2, 0, 0, 0, 0, 0, 0)
             EqPreset.SOFT -> listOf(-2, 0, 2, 3, 2, 0, -1, -2, -3)
             EqPreset.DYNAMIC -> listOf(4, 2, 0, -1, 0, 1, 3, 4, 3)

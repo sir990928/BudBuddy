@@ -34,7 +34,9 @@ class RulesViewModel(application: Application) : AndroidViewModel(application) {
     var isEditScreenOpen by androidx.compose.runtime.mutableStateOf(false)
     var editingRule by androidx.compose.runtime.mutableStateOf<EqRule?>(null)
 
-    val customEqBands = budsController.customEqBands
+    val customEqBands1 = budsController.customEqBands1
+    val customEqBands2 = budsController.customEqBands2
+    val customEqBands3 = budsController.customEqBands3
 
     val uiState: StateFlow<RulesUiState> = combine(
         combine(
@@ -183,8 +185,8 @@ class RulesViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun setCustomEqBands(bands: List<Int>) {
-        budsController.setCustomEqBands(bands)
+    fun setCustomEqBands(preset: EqPreset, bands: List<Int>) {
+        budsController.setCustomEqBands(preset, bands)
     }
 
     fun setManualNoiseControl(ncMode: NoiseControlMode) {
