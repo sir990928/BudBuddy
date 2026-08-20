@@ -464,29 +464,21 @@ class BudsController(
         val packet = SppPacketEncoder.buildPacket(SppPacketEncoder.MSG_ID_CUSTOM_EQUALIZE_SEND, payload)
         packetQueue.trySend(packet)
         Log.i(TAG, "Queued custom EQ bands: ${deviceState.customEqBands.value}")
+        
+        // Follow up with EQ packet to commit the DSP table updates
+        val eqPacket = SppPacketEncoder.buildPacket(
+            SppPacketEncoder.MSG_ID_EQUALIZER,
+            byteArrayOf(EqPreset.CUSTOM.payloadByte)
+        )
+        packetQueue.trySend(eqPacket)
+        Log.i(TAG, "Queued DSP commit packet for custom EQ")
     }
 
-    private suspend fun writeCustomEqFollowup() {
+    private fun writeCustomEqFollowup() {
         if (lastSentEq != EqPreset.CUSTOM) return
         if (!effectiveModel.value.supportsCustomEqualizer) return
-        try {
-            val bandsPacket = SppPacketEncoder.buildPacket(
-                SppPacketEncoder.MSG_ID_CUSTOM_EQUALIZE_SEND,
-                SppPacketEncoder.buildCustomEqualizerPayload(deviceState.customEqBands.value)
-            )
-            socket?.outputStream?.write(bandsPacket)
-            socket?.outputStream?.flush()
-            delay(80)
-            val eqPacket = SppPacketEncoder.buildPacket(
-                SppPacketEncoder.MSG_ID_EQUALIZER,
-                byteArrayOf(EqPreset.CUSTOM.payloadByte)
-            )
-            socket?.outputStream?.write(eqPacket)
-            socket?.outputStream?.flush()
-            Log.i(TAG, "Re-pushed custom EQ after noise-control update")
-        } catch (e: Exception) {
-            Log.e(TAG, "Custom EQ follow-up failed: ${e.message}")
-        }
+        Log.i(TAG, "Re-pushing custom EQ after noise-control update")
+        sendCustomEqualizerBands()
     }
 
     fun sendNoiseControl(mode: NoiseControlMode?) {
@@ -511,14 +503,10 @@ class BudsController(
                 }
                 
                 try {
+                    _packetQueue.trySend(QueuedPacket(packet, isNc = true, ncMode = mode))
+                    Log.i(TAG, "Sent Noise Control to queue: ${mode.name} (attempt $attempt/5)")
                     if (attempt == 1) {
-                        socket?.outputStream?.write(packet)
-                        socket?.outputStream?.flush()
-                        Log.i(TAG, "Sent Noise Control directly without throttle: ${mode.name} (attempt 1)")
-                        writeCustomEqFollowup()
-                    } else {
-                        _packetQueue.trySend(QueuedPacket(packet, isNc = true, ncMode = mode))
-                        Log.i(TAG, "Sent Noise Control to queue: ${mode.name} (attempt $attempt/5)")
+                         writeCustomEqFollowup()
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Send failed: ${e.message}")
