@@ -542,4 +542,6 @@
     <string name="clear_genre_cache_desc">Clear locally cached genres and failed fetch history.</string>
     <string name="cache_cleared">Cache cleared successfully.</string>
     <string name="rule_applied_toast">Applied: %1$s</string>
+    <string name="not_affiliated_samsung">Not affiliated with Samsung Electronics Co., Ltd.</string>
+    <string name="open_source_by_benegedeniz">Bud Buddy is an open-source project by BenEgeDeniz</string>
 </resources>

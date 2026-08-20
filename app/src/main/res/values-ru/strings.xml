@@ -542,4 +542,6 @@
     <string name="clear_genre_cache_desc">Удалить локально сохранённые жанры и историю неудачных запросов.</string>
     <string name="cache_cleared">Кэш успешно очищен.</string>
     <string name="rule_applied_toast">Применено: %1$s</string>
+    <string name="not_affiliated_samsung">Не связано с Samsung Electronics Co., Ltd.</string>
+    <string name="open_source_by_benegedeniz">Bud Buddy — это проект с открытым исходным кодом от BenEgeDeniz.</string>
 </resources>

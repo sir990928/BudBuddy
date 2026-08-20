@@ -49,12 +49,13 @@ import com.benegedeniz.budsdynamiceq.ui.rules.RulesScreen
 import com.benegedeniz.budsdynamiceq.ui.rules.RulesViewModel
 import com.benegedeniz.budsdynamiceq.ui.buds.BudsViewModel
 import com.benegedeniz.budsdynamiceq.ui.settings.AppSettingsScreen
+import com.benegedeniz.budsdynamiceq.ui.settings.AboutBudBuddyScreen
 import com.benegedeniz.budsdynamiceq.ui.wearstate.WearStateScreen
 import com.benegedeniz.budsdynamiceq.ui.wearstate.WearStateViewModel
 import kotlinx.coroutines.launch
 
 // Sub-screen enum for flag-based navigation (no NavHost lifecycle transitions)
-private enum class SubScreen { NONE, FIT_TEST, WEAR_STATE, SOUND_BALANCE_OPTIONS, SOUND_BALANCE_TEST, SETTINGS, FIND_MY_BUDS, EQUALIZER }
+private enum class SubScreen { NONE, FIT_TEST, WEAR_STATE, SOUND_BALANCE_OPTIONS, SOUND_BALANCE_TEST, SETTINGS, FIND_MY_BUDS, EQUALIZER, ABOUT_APP }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -280,6 +281,11 @@ fun MainScreen() {
                         )
                         SubScreen.SETTINGS -> AppSettingsScreen(
                             onBack = { activeSubScreen = SubScreen.NONE },
+                            onAboutClick = { activeSubScreen = SubScreen.ABOUT_APP },
+                            modifier = Modifier.fillMaxSize()
+                        )
+                        SubScreen.ABOUT_APP -> AboutBudBuddyScreen(
+                            onBack = { activeSubScreen = SubScreen.SETTINGS },
                             modifier = Modifier.fillMaxSize()
                         )
                         SubScreen.FIND_MY_BUDS -> com.benegedeniz.budsdynamiceq.ui.findmybuds.FindMyBudsScreen(

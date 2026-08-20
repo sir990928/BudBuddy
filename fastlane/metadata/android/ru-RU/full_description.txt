@@ -12,3 +12,6 @@ Bud Buddy — улучшенная открытая альтернатива Sam
 
 Благодарности:
 Подход к управлению наушниками через Bluetooth-байты взят из отличной работы над проектом GalaxyBudsClient (https://github.com/timschneeb/GalaxyBudsClient).
+
+Bud Buddy — это проект с открытым исходным кодом от BenEgeDeniz.
+Не связано с Samsung Electronics Co., Ltd.

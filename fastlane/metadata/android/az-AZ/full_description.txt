@@ -12,3 +12,6 @@ Dəstəklənən Qulaqlıqlar:
 
 Təşəkkürlər:
 Qulaqlıqların Bluetooth baytları vasitəsilə idarə edilməsi yanaşması GalaxyBudsClient layihəsində (https://github.com/timschneeb/GalaxyBudsClient) görülən fantastik işlərdən öyrənilmişdir.
+
+Bud Buddy, BenEgeDeniz tərəfindən hazırlanmış açıq mənbəli layihədir.
+Samsung Electronics Co., Ltd. ilə heç bir əlaqəsi yoxdur.

@@ -12,3 +12,6 @@ Desteklenen Kulaklıklar:
 
 Teşekkürler:
 Kulaklıkların Bluetooth baytları üzerinden kontrol edilme yaklaşımı, GalaxyBudsClient projesinde (https://github.com/timschneeb/GalaxyBudsClient) yapılan harika çalışmalardan öğrenilmiştir.
+
+Bud Buddy, BenEgeDeniz tarafından geliştirilmiş açık kaynaklı bir projedir.
+Samsung Electronics Co., Ltd. ile bağlantısı yoktur.

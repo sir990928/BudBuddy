@@ -539,7 +539,9 @@
     <string name="auto_connect_buds">Kulaklıklara Otomatik Bağlan</string>
     <string name="auto_connect_buds_desc">Kaydedilmiş Galaxy Buds bluetooth üzerinden bağlandığında servisi başlat.</string>
     <string name="clear_genre_cache">Tür Ön belleğini Temizle</string>
-    <string name="clear_genre_cache_desc">Yerel önbelleği temizleyerek türlerin yeniden indirilmesini zorla.</string>
+    <string name="clear_genre_cache_desc">Yerel olarak önbelleğe alınmış türleri ve başarısız getirme geçmişini temizle.</string>
     <string name="cache_cleared">Önbellek başarıyla temizlendi.</string>
     <string name="rule_applied_toast">Uygulandı: %1$s</string>
+    <string name="not_affiliated_samsung">Samsung Electronics Co., Ltd. ile bağlantısı yoktur.</string>
+    <string name="open_source_by_benegedeniz">Bud Buddy, BenEgeDeniz tarafından geliştirilmiş açık kaynaklı bir projedir.</string>
 </resources>
