@@ -236,18 +236,22 @@ class BudsService : Service() {
             }
         }
 
-        // Handle conversation mode (pause on transparency)
+        // Handle conversation mode (pause on transparency) and auto play on ANC
+        val playMediaOnAncFlow = ServiceLocator.playMediaOnAnc
         scope.launch {
             var previousNcMode: NoiseControlMode? = null
             combine(
                 budsController.activeNoiseControl,
-                pauseMediaOnConversationFlow
-            ) { ncMode, pauseOnTransparency ->
-                Pair(ncMode, pauseOnTransparency)
-            }.collect { (ncMode, pauseOnTransparency) ->
-                if (pauseOnTransparency && previousNcMode != null && ncMode != previousNcMode) {
-                    if (ncMode == NoiseControlMode.TRANSPARENT) {
+                pauseMediaOnConversationFlow,
+                playMediaOnAncFlow
+            ) { ncMode, pauseOnTransparency, playOnAnc ->
+                Triple(ncMode, pauseOnTransparency, playOnAnc)
+            }.collect { (ncMode, pauseOnTransparency, playOnAnc) ->
+                if (previousNcMode != null && ncMode != previousNcMode) {
+                    if (pauseOnTransparency && ncMode == NoiseControlMode.TRANSPARENT) {
                         actionExecutor.triggerPause()
+                    } else if (playOnAnc && ncMode == NoiseControlMode.NOISE_CANCELLATION) {
+                        actionExecutor.triggerPlay()
                     }
                 }
                 previousNcMode = ncMode

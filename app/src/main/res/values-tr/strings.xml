@@ -208,6 +208,8 @@
 	<string name="requires_both_earbuds_to_be_worn">Her iki kulaklığın da takılı olması gerekir</string>
 	<string name="auto_pause_media">Ortam Sesinde Duraklat</string>
 	<string name="pauses_media_when_ambient_mode_is_trigge">Ortam Sesi modu etkinleştiğinde medyayı duraklatır.</string>
+	<string name="auto_play_on_anc">ANC\'de Oynat</string>
+	<string name="plays_media_when_anc_is_triggered">Aktif Gürültü Engelleme modu etkinleştiğinde medyayı oynatır.</string>
 	<string name="wear_state_actions">Takma Durumu Eylemleri</string>
 	<string name="earbud_fit_test">Kulaklık Uyum Testi</string>
 	<string name="language">Dil</string>

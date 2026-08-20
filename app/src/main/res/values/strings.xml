@@ -208,6 +208,8 @@
 	<string name="requires_both_earbuds_to_be_worn">Requires both earbuds to be worn</string>
 	<string name="auto_pause_media">Pause on Transparency</string>
 	<string name="pauses_media_when_ambient_mode_is_trigge">Pauses media whenever Transparency mode is activated.</string>
+	<string name="auto_play_on_anc">Play on ANC</string>
+	<string name="plays_media_when_anc_is_triggered">Plays media whenever Active Noise Cancelling mode is activated.</string>
 	<string name="wear_state_actions">Wear State Actions</string>
 	<string name="earbud_fit_test">Earbud Fit Test</string>
 	<string name="language">Language</string>

@@ -208,6 +208,8 @@
 	<string name="requires_both_earbuds_to_be_worn">Нужно надеть оба наушника</string>
 	<string name="auto_pause_media">Пауза при прозрачности</string>
 	<string name="pauses_media_when_ambient_mode_is_trigge">Ставит медиа на паузу при включении режима прозрачности.</string>
+	<string name="auto_play_on_anc">Воспроизведение при ANC</string>
+	<string name="plays_media_when_anc_is_triggered">Включает воспроизведение медиа при включении режима активного шумоподавления.</string>
 	<string name="wear_state_actions">Действия по состоянию ношения</string>
 	<string name="earbud_fit_test">Проверка посадки</string>
 	<string name="language">Язык</string>

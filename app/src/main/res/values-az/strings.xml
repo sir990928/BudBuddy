@@ -208,6 +208,8 @@
 	<string name="requires_both_earbuds_to_be_worn">Hər iki qulaqlığın da taxılı olması tələb olunur</string>
 	<string name="auto_pause_media">Şəffaflıqda Dayandır</string>
 	<string name="pauses_media_when_ambient_mode_is_trigge">Şəffaflıq rejimi aktiv olduqda medianı dayandırır.</string>
+	<string name="auto_play_on_anc">ANC-də Oynat</string>
+	<string name="plays_media_when_anc_is_triggered">Aktiv Səs-küyün Ləğvi rejimi aktiv olduqda medianı oynadır.</string>
 	<string name="wear_state_actions">Taxma Vəziyyəti Əməliyyatları</string>
 	<string name="earbud_fit_test">Qulaqlıq Uyğunluq Sınağı</string>
 	<string name="language">Dil</string>

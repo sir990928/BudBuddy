@@ -89,6 +89,15 @@ class RulesViewModel(application: Application) : AndroidViewModel(application) {
         ServiceLocator.setPauseMediaOnConversation(enabled)
     }
 
+    private val _playMediaOnAncEnabled = MutableStateFlow(false)
+    val playMediaOnAncEnabled: StateFlow<Boolean> = _playMediaOnAncEnabled.asStateFlow()
+
+    fun setPlayMediaOnAnc(enabled: Boolean, prefs: android.content.SharedPreferences) {
+        _playMediaOnAncEnabled.value = enabled
+        prefs.edit().putBoolean("play_media_on_anc", enabled).apply()
+        ServiceLocator.setPlayMediaOnAnc(enabled)
+    }
+
     init {
         viewModelScope.launch {
             repository.loadRules()
@@ -97,8 +106,10 @@ class RulesViewModel(application: Application) : AndroidViewModel(application) {
         // Keep ServiceLocator in sync in case RulesViewModel is created before BudsService calls initFromPrefs
         val prefs = application.getSharedPreferences("BudsPrefs", android.content.Context.MODE_PRIVATE)
         _pauseMediaOnConversationEnabled.value = prefs.getBoolean("pause_media_on_conversation", false)
+        _playMediaOnAncEnabled.value = prefs.getBoolean("play_media_on_anc", false)
         // Keep ServiceLocator in sync in case RulesViewModel is created before BudsService calls initFromPrefs
         ServiceLocator.setPauseMediaOnConversation(_pauseMediaOnConversationEnabled.value)
+        ServiceLocator.setPlayMediaOnAnc(_playMediaOnAncEnabled.value)
         
         if (budsController.manualPreset.value == null) {
             val savedPresetName = prefs.getString("default_preset", null)

@@ -195,9 +195,13 @@ fun AppSearchOverlay(
                     
                     val togglePauseMedia = context.getString(R.string.auto_pause_media).lowercase()
                     val pauseMediaDesc = context.getString(R.string.pauses_media_when_ambient_mode_is_trigge).lowercase()
-                    val mPauseMedia = effectiveModel.supportsConversationDetection && (togglePauseMedia.contains(query) || pauseMediaDesc.contains(query))
+                    val togglePlayOnAnc = context.getString(R.string.auto_play_on_anc).lowercase()
+                    val playOnAncDesc = context.getString(R.string.plays_media_when_anc_is_triggered).lowercase()
+                    
+                    val mMediaControls = (effectiveModel.supportsTransparencyNC && (togglePauseMedia.contains(query) || pauseMediaDesc.contains(query))) || 
+                                         (togglePlayOnAnc.contains(query) || playOnAncDesc.contains(query))
 
-                    if (mNoiseControls || mOneEarbud || mAmbientCall || mInEarCall || mFitTest || mWearState || mSoundBalance || mFindBuds || mEqualizer || mDoubleTap || mVoiceDetect || mPauseMedia) {
+                    if (mNoiseControls || mOneEarbud || mAmbientCall || mInEarCall || mFitTest || mWearState || mSoundBalance || mFindBuds || mEqualizer || mDoubleTap || mVoiceDetect || mMediaControls) {
                         item(key = "header_home") {
                             SearchSectionHeader(
                                 appName = context.getString(R.string.app_name),
@@ -357,15 +361,19 @@ fun AppSearchOverlay(
                         }
                     }
 
-                    if (mPauseMedia) {
-                        item(key = "pause_media") {
+                    if (mMediaControls) {
+                        item(key = "media_controls") {
                             val pauseMediaEnabled by rulesViewModel.pauseMediaOnConversationEnabled.collectAsState()
+                            val playMediaEnabled by rulesViewModel.playMediaOnAncEnabled.collectAsState()
                             val prefs = context.getSharedPreferences("BudsPrefs", android.content.Context.MODE_PRIVATE)
                             
-                            AutoPauseMediaCard(
+                            AutoMediaControlsCard(
                                 isConnected = budsState.isConnected,
+                                effectiveModel = budsState.effectiveModel,
                                 pauseMediaOnConversation = pauseMediaEnabled,
-                                onCheckedChange = { rulesViewModel.setPauseMediaOnConversation(it, prefs) },
+                                playMediaOnAnc = playMediaEnabled,
+                                onPauseMediaChange = { rulesViewModel.setPauseMediaOnConversation(it, prefs) },
+                                onPlayMediaChange = { rulesViewModel.setPlayMediaOnAnc(it, prefs) },
                                 modifier = Modifier.animateItem().padding(horizontal = 16.dp, vertical = 8.dp)
                             )
                         }
@@ -516,7 +524,7 @@ fun AppSearchOverlay(
                         )
                     }
 
-                    val hasAnyResults = mNoiseControls || mOneEarbud || mAmbientCall || mInEarCall || mFitTest || mWearState || mSoundBalance || mFindBuds || mEqualizer || mDoubleTap || mVoiceDetect || mPauseMedia || mActiveRule || mGlobalDefaults || matchingRules.isNotEmpty() || mGesturesStatus || mMovementCancelling || matchingGestures.isNotEmpty()
+                    val hasAnyResults = mNoiseControls || mOneEarbud || mAmbientCall || mInEarCall || mFitTest || mWearState || mSoundBalance || mFindBuds || mEqualizer || mDoubleTap || mVoiceDetect || mMediaControls || mActiveRule || mGlobalDefaults || matchingRules.isNotEmpty() || mGesturesStatus || mMovementCancelling || matchingGestures.isNotEmpty()
 
                     if (!hasAnyResults) {
                         item(key = "empty_no_results") {

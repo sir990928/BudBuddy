@@ -122,6 +122,7 @@ fun BudsScreen(
     val context = LocalContext.current
     val prefsLocal = remember(context) { context.getSharedPreferences("BudsPrefs", android.content.Context.MODE_PRIVATE) }
     val pauseMediaOnConversation by rulesViewModel.pauseMediaOnConversationEnabled.collectAsState()
+    val playMediaOnAnc by rulesViewModel.playMediaOnAncEnabled.collectAsState()
     
     var isMoreSettingsExpanded by remember { mutableStateOf(false) }
     
@@ -731,17 +732,18 @@ fun BudsScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            // Auto-Pause on Transparency Mode — independent toggle
-            if (effectiveModel.supportsTransparencyNC) {
-                item {
-                AutoPauseMediaCard(
-                    isConnected = isConnected,
-                    pauseMediaOnConversation = pauseMediaOnConversation,
-                    onCheckedChange = { rulesViewModel.setPauseMediaOnConversation(it, prefsLocal) }
-                )
-                Spacer(modifier = Modifier.height(16.dp))
+            // Auto Media Controls (Pause on Transparency / Play on ANC)
+            item {
+                    AutoMediaControlsCard(
+                        isConnected = isConnected,
+                        effectiveModel = effectiveModel,
+                        pauseMediaOnConversation = pauseMediaOnConversation,
+                        playMediaOnAnc = playMediaOnAnc,
+                        onPauseMediaChange = { rulesViewModel.setPauseMediaOnConversation(it, prefsLocal) },
+                        onPlayMediaChange = { rulesViewModel.setPlayMediaOnAnc(it, prefsLocal) }
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
-            }
 
             // Wear State Actions Button
             item {
