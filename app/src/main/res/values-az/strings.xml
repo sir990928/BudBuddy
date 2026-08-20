@@ -14,6 +14,7 @@
 	<string name="does_not_match_current_song">Cari mahnıyla uyğun gəlmir</string>
 	<string name="fetching_genre">Janr Alınır...</string>
 	<string name="equalizer">Ekvalayzер</string>
+	<string name="equalizer_disabled_by_rule">Aktiv qayda tərəfindən deaktiv edilib</string>
 	<string name="noise_control">Səs-küy Nəzarəti</string>
 	<string name="grant_system_permissions">Sistem İcazələrini Ver</string>
 	<string name="grant_notification_access">Bildiriş İcazəsi Ver</string>
@@ -201,12 +202,16 @@
 	<string name="use_ambient_sound_during_calls">Zənglər zamanı Ətraf Səsini İstifadə Et</string>
 	<string name="in_ear_detection_for_calls">Zənglər üçün Qulaqdaxili Aşkarlama</string>
 	<string name="play_calls_through_earbuds_when_in_ear_s">Zəngləri taxılarkən qulaqlığa, taxılmayanda isə dinamikə yönləndir</string>
-	<string name="left_right_sound_balance">Sol/Sağ Səs Balansı</string>
+	<string name="left_right_sound_balance">Səs Balansı</string>
+	<string name="sound_options">Səs Seçimləri</string>
+	<string name="reset_to_center">Mərkəzə Sıfırla</string>
 	<string name="conversation_detection">Söhbət Aşkarlaması</string>
 	<string name="automatically_switches_to_ambient_mode_w">Danışdığınızda avtomatik olaraq Ətraf Səsi rejiminə keçir.</string>
 	<string name="requires_both_earbuds_to_be_worn">Hər iki qulaqlığın da taxılı olması tələb olunur</string>
 	<string name="auto_pause_media">Şəffaflıqda Dayandır</string>
 	<string name="pauses_media_when_ambient_mode_is_trigge">Şəffaflıq rejimi aktiv olduqda medianı dayandırır.</string>
+	<string name="auto_play_on_anc">ANC-də Oynat</string>
+	<string name="plays_media_when_anc_is_triggered">Aktiv Səs-küyün Ləğvi rejimi aktiv olduqda medianı oynadır.</string>
 	<string name="wear_state_actions">Taxma Vəziyyəti Əməliyyatları</string>
 	<string name="earbud_fit_test">Qulaqlıq Uyğunluq Sınağı</string>
 	<string name="language">Dil</string>
@@ -231,7 +236,7 @@
 	<string name="right_ear_test">Sağ Qulaq Sınağı</string>
 	<string name="now_testing_your_right_ear_n_npress_and_">İndi sağ qulağınız sınaqdan keçirilir.\n\nDüyməni basıb saxlayın. Səsi eşitmədiyi an barmağınızı çəkin.</string>
 	<string name="find_your_perfect_balance">Mükəmməl Balansınızı Tapın</string>
-	<string name="this_test_will_determine_the_optimal_lef">Bu sınaq, qulaqlarınız üçün optimal Sol/Sağ səs balansını müəyyənləşdirir.</string>
+	<string name="this_test_will_determine_the_optimal_lef">Bu sınaq, qulaqlarınız üçün optimal səs balansını müəyyənləşdirir.</string>
 	<string name="your_media_will_be_paused_and_system_vol">Dəqiqlik üçün media dayandırılacaq və sistem səsi müvəqqəti olaraq maksimuma qaldırılacaq.</string>
 	<string name="sensory_warning_this_test_plays_a_contin">Sensor Xəbərdarlığı: Bu sınaq kəsilməz 1000 Hz səs çalır. Sensor həssaslığı olan istifadəçilərin diqqətli olması tövsiyə edilir.</string>
 	<string name="please_go_to_a_quiet_environment_active_">Zəhmət olmasa sakit bir mühitə keçin. Sınaq zamanı ANC müvəqqəti olaraq açılacaq.</string>
@@ -290,6 +295,11 @@
 	<string name="eq_dynamic">Dinamik</string>
 	<string name="eq_clear">Aydın</string>
 	<string name="eq_treble_boost">Tiz artırma</string>
+	<string name="eq_custom_1">Fərdi 1</string>
+	<string name="eq_custom_2">Fərdi 2</string>
+	<string name="eq_custom_3">Fərdi 3</string>
+	<string name="equalizer_adjust_hint">Səsi zövqünüzə görə tənzimləyin.</string>
+	<string name="equalizer_custom_unsupported">Zolaq üzrə tənzimləmə Galaxy Buds 3 və yenilərində mövcuddur.</string>
 	<string name="nc_default">Standart</string>
 	<string name="nc_ignore">Dəyişmə</string>
 	<string name="nc_off">Söndürülmüş</string>
@@ -517,6 +527,10 @@
     <string name="show_toast_rule_match">Qayda Tətbiq Edildikdə Bildiriş Göstər</string>
     <string name="show_toast_rule_match_desc">Bir qayda avtomatik tətbiq edildikdə qısa bir mesaj göstər.</string>
     <string name="system_integration">Sistem İnteqrasiyası</string>
+    <string name="ignored_media_players">İdarə Edilməyən Media Oynadıcılar</string>
+    <string name="ignored_media_players_desc">Dinamik EQ qaydalarını heç vaxt işə salmamalı olan media tətbiqlərini seçin.</string>
+    <string name="select_all">Hamısını Seç</string>
+    <string name="deselect_all">Hamısını Ləğv Et</string>
     <string name="start_on_boot">Cihaz Açılanda Başlat</string>
     <string name="start_on_boot_desc">Cihaz açıldıqda arxa plan xidmətini avtomatik başlat.</string>
     <string name="auto_connect_buds">Qulaqlıqlara Avtomatik Qoşul</string>

@@ -48,7 +48,7 @@ class MediaListenerService : NotificationListenerService() {
             
             if (!title.isNullOrBlank()) {
                 Log.d("MediaListenerService", "Extracted song from notification: $artist - $title")
-                ServiceLocator.provideMediaObserver(this).updateTitleFromNotification(title, artist)
+                ServiceLocator.provideMediaObserver(this).updateTitleFromNotification(title, artist, sbn.packageName)
             }
         }
     }

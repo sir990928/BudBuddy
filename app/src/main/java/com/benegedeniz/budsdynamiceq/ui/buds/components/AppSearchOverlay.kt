@@ -59,6 +59,7 @@ fun AppSearchOverlay(
     onWearStateClick: () -> Unit,
     onSoundBalanceTestClick: () -> Unit,
     onFindMyBudsClick: () -> Unit,
+    onEqualizerClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var searchQuery by remember { mutableStateOf("") }
@@ -175,10 +176,19 @@ fun AppSearchOverlay(
                     val mWearState = titleWearState.contains(query)
                     
                     val titleSoundBalance = context.getString(R.string.take_hearing_test).lowercase()
-                    val mSoundBalance = titleSoundBalance.contains(query) || context.getString(R.string.left_right_sound_balance).lowercase().contains(query)
+                    val mSoundBalance = titleSoundBalance.contains(query) || 
+                        context.getString(R.string.left_right_sound_balance).lowercase().contains(query) ||
+                        context.getString(R.string.sound_options).lowercase().contains(query) ||
+                        context.getString(R.string.sound_balance_test).lowercase().contains(query)
                     
                     val titleFindBuds = context.getString(R.string.find_my_earbuds).lowercase()
                     val mFindBuds = titleFindBuds.contains(query)
+
+                    val titleEqualizer = context.getString(R.string.equalizer).lowercase()
+                    val mEqualizer = titleEqualizer.contains(query) ||
+                        context.getString(R.string.eq_custom_1).lowercase().contains(query) ||
+                        context.getString(R.string.eq_custom_2).lowercase().contains(query) ||
+                        context.getString(R.string.eq_custom_3).lowercase().contains(query)
                     
                     val toggleDoubleTap = context.getString(R.string.double_tap_earbud_edge).lowercase()
                     val mDoubleTap = effectiveModel.supportsDoubleTapEdge && toggleDoubleTap.contains(query)
@@ -188,13 +198,22 @@ fun AppSearchOverlay(
                     
                     val togglePauseMedia = context.getString(R.string.auto_pause_media).lowercase()
                     val pauseMediaDesc = context.getString(R.string.pauses_media_when_ambient_mode_is_trigge).lowercase()
-                    val mPauseMedia = effectiveModel.supportsConversationDetection && (togglePauseMedia.contains(query) || pauseMediaDesc.contains(query))
+                    val togglePlayOnAnc = context.getString(R.string.auto_play_on_anc).lowercase()
+                    val playOnAncDesc = context.getString(R.string.plays_media_when_anc_is_triggered).lowercase()
+                    
+                    val mMediaControls = (effectiveModel.supportsTransparencyNC && (togglePauseMedia.contains(query) || pauseMediaDesc.contains(query))) || 
+                                         (togglePlayOnAnc.contains(query) || playOnAncDesc.contains(query))
 
-                    if (mNoiseControls || mOneEarbud || mAmbientCall || mInEarCall || mFitTest || mWearState || mSoundBalance || mFindBuds || mDoubleTap || mVoiceDetect || mPauseMedia) {
-                        item(key = "header_home") {
+                    val hasNoiseGroup = mNoiseControls || mOneEarbud || mAmbientCall || mInEarCall || mDoubleTap || mVoiceDetect || mMediaControls
+                    val hasSoundGroup = mEqualizer || mSoundBalance
+                    val hasDeviceGroup = mWearState || mFitTest || mFindBuds
+
+                    // 1.1 Noise Controls Group
+                    if (hasNoiseGroup) {
+                        item(key = "header_noise_controls") {
                             SearchSectionHeader(
-                                appName = context.getString(R.string.app_name),
                                 sectionName = context.getString(R.string.tab_home),
+                                categoryName = context.getString(R.string.noise_controls),
                                 modifier = Modifier.animateItem()
                             )
                         }
@@ -248,65 +267,6 @@ fun AppSearchOverlay(
                         }
                     }
 
-                    if (mFitTest) {
-                        item(key = "fit_test") {
-                            FitTestCard(
-                                isConnected = budsState.isConnected,
-                                placementL = budsState.placementL,
-                                placementR = budsState.placementR,
-                                onClick = { 
-                                    onClose()
-                                    onFitTestClick() 
-                                },
-                                modifier = Modifier.animateItem().padding(horizontal = 16.dp, vertical = 8.dp)
-                            )
-                        }
-                    }
-
-                    if (mWearState) {
-                        item(key = "wear_state") {
-                            WearStateActionsCard(
-                                isConnected = budsState.isConnected,
-                                onClick = { 
-                                    onClose()
-                                    onWearStateClick() 
-                                },
-                                modifier = Modifier.animateItem().padding(horizontal = 16.dp, vertical = 8.dp)
-                            )
-                        }
-                    }
-
-                    if (mSoundBalance) {
-                        item(key = "sound_balance") {
-                            SoundBalanceCard(
-                                isConnected = budsState.isConnected,
-                                placementL = budsState.placementL,
-                                placementR = budsState.placementR,
-                                stereoBalance = budsState.stereoBalance,
-                                onBalanceChange = { budsViewModel.setStereoBalance(it) },
-                                onBalanceChangeFinished = { budsViewModel.setStereoBalance(it) },
-                                onSoundBalanceTestClick = { 
-                                    onClose()
-                                    onSoundBalanceTestClick() 
-                                },
-                                modifier = Modifier.animateItem().padding(horizontal = 16.dp, vertical = 8.dp)
-                            )
-                        }
-                    }
-
-                    if (mFindBuds) {
-                        item(key = "find_buds") {
-                            FindMyEarbudsCard(
-                                isConnected = budsState.isConnected,
-                                onClick = { 
-                                    onClose()
-                                    onFindMyBudsClick() 
-                                },
-                                modifier = Modifier.animateItem().padding(horizontal = 16.dp, vertical = 8.dp)
-                            )
-                        }
-                    }
-
                     if (mDoubleTap) {
                         item(key = "double_tap") {
                             DoubleTapEdgeCard(
@@ -331,15 +291,114 @@ fun AppSearchOverlay(
                         }
                     }
 
-                    if (mPauseMedia) {
-                        item(key = "pause_media") {
+                    if (mMediaControls) {
+                        item(key = "media_controls") {
                             val pauseMediaEnabled by rulesViewModel.pauseMediaOnConversationEnabled.collectAsState()
+                            val playMediaEnabled by rulesViewModel.playMediaOnAncEnabled.collectAsState()
                             val prefs = context.getSharedPreferences("BudsPrefs", android.content.Context.MODE_PRIVATE)
                             
-                            AutoPauseMediaCard(
+                            AutoMediaControlsCard(
                                 isConnected = budsState.isConnected,
+                                effectiveModel = budsState.effectiveModel,
                                 pauseMediaOnConversation = pauseMediaEnabled,
-                                onCheckedChange = { rulesViewModel.setPauseMediaOnConversation(it, prefs) },
+                                playMediaOnAnc = playMediaEnabled,
+                                onPauseMediaChange = { rulesViewModel.setPauseMediaOnConversation(it, prefs) },
+                                onPlayMediaChange = { rulesViewModel.setPlayMediaOnAnc(it, prefs) },
+                                modifier = Modifier.animateItem().padding(horizontal = 16.dp, vertical = 8.dp)
+                            )
+                        }
+                    }
+
+                    // 1.2 Sound Options Group
+                    if (hasSoundGroup) {
+                        item(key = "header_sound_options") {
+                            SearchSectionHeader(
+                                sectionName = context.getString(R.string.tab_home),
+                                categoryName = context.getString(R.string.sound_options),
+                                modifier = Modifier.animateItem()
+                            )
+                        }
+                    }
+
+                    if (mEqualizer) {
+                        item(key = "equalizer") {
+                            EqualizerCard(
+                                isConnected = budsState.isConnected,
+                                currentPreset = if (budsState.lastMatchedRule == null || budsState.lastMatchedRule?.preset == com.benegedeniz.budsdynamiceq.data.model.EqPreset.DEFAULT) {
+                                    budsState.manualPreset
+                                } else {
+                                    budsState.lastMatchedRule?.preset
+                                },
+                                isRuleActive = budsState.lastMatchedRule != null && budsState.lastMatchedRule?.preset != com.benegedeniz.budsdynamiceq.data.model.EqPreset.IGNORE,
+                                onClick = {
+                                    onClose()
+                                    onEqualizerClick()
+                                },
+                                modifier = Modifier.animateItem().padding(horizontal = 16.dp, vertical = 8.dp)
+                            )
+                        }
+                    }
+
+                    if (mSoundBalance) {
+                        item(key = "sound_balance") {
+                            SoundBalanceEntryCard(
+                                isConnected = budsState.isConnected,
+                                onClick = { 
+                                    onClose()
+                                    onSoundBalanceTestClick() 
+                                },
+                                modifier = Modifier.animateItem().padding(horizontal = 16.dp, vertical = 8.dp)
+                            )
+                        }
+                    }
+
+                    // 1.3 Device Options Group
+                    if (hasDeviceGroup) {
+                        item(key = "header_device_options") {
+                            SearchSectionHeader(
+                                sectionName = context.getString(R.string.tab_home),
+                                categoryName = context.getString(R.string.device_options),
+                                modifier = Modifier.animateItem()
+                            )
+                        }
+                    }
+
+                    if (mWearState) {
+                        item(key = "wear_state") {
+                            WearStateActionsCard(
+                                isConnected = budsState.isConnected,
+                                onClick = { 
+                                    onClose()
+                                    onWearStateClick() 
+                                },
+                                modifier = Modifier.animateItem().padding(horizontal = 16.dp, vertical = 8.dp)
+                            )
+                        }
+                    }
+
+                    if (mFitTest) {
+                        item(key = "fit_test") {
+                            FitTestCard(
+                                isConnected = budsState.isConnected,
+                                placementL = budsState.placementL,
+                                placementR = budsState.placementR,
+                                onClick = { 
+                                    onClose()
+                                    onFitTestClick() 
+                                },
+                                modifier = Modifier.animateItem().padding(horizontal = 16.dp, vertical = 8.dp)
+                            )
+                        }
+                    }
+
+                    if (mFindBuds) {
+                        item(key = "find_buds") {
+                            FindMyEarbudsCard(
+                                isConnected = budsState.isConnected,
+                                onClick = { 
+                                    onClose()
+                                    onFindMyBudsClick() 
+                                },
                                 modifier = Modifier.animateItem().padding(horizontal = 16.dp, vertical = 8.dp)
                             )
                         }
@@ -355,7 +414,6 @@ fun AppSearchOverlay(
                     if (mActiveRule || mGlobalDefaults || matchingRules.isNotEmpty()) {
                         item(key = "header_rules") {
                             SearchSectionHeader(
-                                appName = context.getString(R.string.app_name),
                                 sectionName = context.getString(R.string.tab_rules),
                                 modifier = Modifier.animateItem()
                             )
@@ -419,7 +477,6 @@ fun AppSearchOverlay(
                     if (mGesturesStatus || mMovementCancelling || matchingGestures.isNotEmpty()) {
                         item(key = "header_gestures") {
                             SearchSectionHeader(
-                                appName = context.getString(R.string.app_name),
                                 sectionName = context.getString(R.string.tab_gestures),
                                 modifier = Modifier.animateItem()
                             )
@@ -490,7 +547,7 @@ fun AppSearchOverlay(
                         )
                     }
 
-                    val hasAnyResults = mNoiseControls || mOneEarbud || mAmbientCall || mInEarCall || mFitTest || mWearState || mSoundBalance || mFindBuds || mDoubleTap || mVoiceDetect || mPauseMedia || mActiveRule || mGlobalDefaults || matchingRules.isNotEmpty() || mGesturesStatus || mMovementCancelling || matchingGestures.isNotEmpty()
+                    val hasAnyResults = mNoiseControls || mOneEarbud || mAmbientCall || mInEarCall || mFitTest || mWearState || mSoundBalance || mFindBuds || mEqualizer || mDoubleTap || mVoiceDetect || mMediaControls || mActiveRule || mGlobalDefaults || matchingRules.isNotEmpty() || mGesturesStatus || mMovementCancelling || matchingGestures.isNotEmpty()
 
                     if (!hasAnyResults) {
                         item(key = "empty_no_results") {
@@ -522,12 +579,17 @@ fun AppSearchOverlay(
 
 @Composable
 fun SearchSectionHeader(
-    appName: String, 
     sectionName: String,
+    categoryName: String? = null,
     modifier: Modifier = Modifier
 ) {
+    val text = if (!categoryName.isNullOrBlank()) {
+        "$sectionName > $categoryName"
+    } else {
+        "$sectionName"
+    }
     Text(
-        text = "$appName > $sectionName",
+        text = text,
         style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.primary,
         modifier = modifier.padding(horizontal = 24.dp, vertical = 8.dp)

@@ -1,0 +1,7 @@
+✨ v1.6.0
+- Buds3 və daha yeni modellər üçün zolaq üzrə Xüsusi EQ dəstəyi. (GitHub-dan @MrMe0ws-a təşəkkürlər)
+- Rus dili dəstəyi. (GitHub-dan @MrMe0ws-a təşəkkürlər)
+- EQ qaydalarını işə salmamalı olan tətbiqləri (KDE Connect kimi) nəzərə almamaq üçün "İdarə Edilməyən Media Oynadıcılar" əlavə edildi.
+- "Şəffaflıq Rejimində Pauza" xüsusiyyətinə kömək etmək üçün "ANC-də İfa Et" keçidi əlavə edildi.
+- Daha yaxşı istifadəçi təcrübəsi üçün ana ekran yenidən təşkil edildi.
+- Müxtəlif xəta düzəlişləri və təkmilləşdirmələr

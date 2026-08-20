@@ -1,0 +1,7 @@
+✨ v1.6.0
+- Buds3 ve daha yeni modeller için bant bazlı Özel EQ desteği. (GitHub'dan @MrMe0ws'a teşekkürler)
+- Rusça dil desteği. (GitHub'dan @MrMe0ws'a teşekkürler)
+- EQ kurallarını tetiklememesi gereken uygulamaları (KDE Connect gibi) yok saymak için "Yok Sayılan Medya Oynatıcılar" özelliği eklendi.
+- "Şeffaflık Modunda Duraklat" özelliğine yardımcı olmak için "ANC'de Oynat" geçişi eklendi.
+- Daha iyi kullanıcı deneyimi için ana ekran yeniden düzenlendi.
+- Çeşitli hata düzeltmeleri ve iyileştirmeler

@@ -95,6 +95,7 @@ fun SoundBalanceTestScreen(viewModel: BudsViewModel, onBack: () -> Unit, modifie
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             PageHeader(
                 title = stringResource(R.string.sound_balance_test),

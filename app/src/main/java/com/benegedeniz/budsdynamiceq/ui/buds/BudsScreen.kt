@@ -55,6 +55,7 @@ import com.benegedeniz.budsdynamiceq.data.model.NoiseControlMode
 import androidx.compose.ui.graphics.graphicsLayer
 import com.benegedeniz.budsdynamiceq.ui.components.SearchBarInput
 import com.benegedeniz.budsdynamiceq.ui.components.PageHeader
+import com.benegedeniz.budsdynamiceq.ui.components.rememberPageHeaderOverlayPadding
 import com.benegedeniz.budsdynamiceq.ui.components.bounceClick
 import com.benegedeniz.budsdynamiceq.ui.buds.components.*
 import com.benegedeniz.budsdynamiceq.ui.rules.RulesViewModel
@@ -96,6 +97,7 @@ fun BudsScreen(
     onSoundBalanceTestClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {},
     onFindMyBudsClick: () -> Unit = {},
+    onEqualizerClick: () -> Unit = {},
     onOpenSearch: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -120,6 +122,7 @@ fun BudsScreen(
     val context = LocalContext.current
     val prefsLocal = remember(context) { context.getSharedPreferences("BudsPrefs", android.content.Context.MODE_PRIVATE) }
     val pauseMediaOnConversation by rulesViewModel.pauseMediaOnConversationEnabled.collectAsState()
+    val playMediaOnAnc by rulesViewModel.playMediaOnAncEnabled.collectAsState()
     
     var isMoreSettingsExpanded by remember { mutableStateOf(false) }
     
@@ -211,6 +214,8 @@ fun BudsScreen(
         label = "overscrollAnimation"
     )
 
+    val headerOverlay = rememberPageHeaderOverlayPadding()
+
     Box(
         modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
     ) {
@@ -227,7 +232,7 @@ fun BudsScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 150.dp)
+                .padding(top = headerOverlay.listTop)
                 .graphicsLayer { alpha = searchHintAlpha },
             contentAlignment = Alignment.Center
         ) {
@@ -263,7 +268,7 @@ fun BudsScreen(
                 .graphicsLayer {
                     translationY = animatedOverscroll * 0.5f
                 },
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 140.dp, bottom = 120.dp)
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = headerOverlay.listTop, bottom = 120.dp)
         ) {
             // Status Section
             item {
@@ -494,12 +499,10 @@ fun BudsScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            // Noise Controls Card
+            // Noise Controls Section
             item {
-                Text(
-                    text = stringResource(R.string.noise_controls),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                SectionHeader(
+                    title = stringResource(R.string.noise_controls),
                     modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
                 )
                 Card(
@@ -522,8 +525,9 @@ fun BudsScreen(
                         val bothInEar = isConnected && placementL == com.benegedeniz.budsdynamiceq.data.model.PlacementState.WEARING && placementR == com.benegedeniz.budsdynamiceq.data.model.PlacementState.WEARING
                         val anyInEar = isConnected && (placementL == com.benegedeniz.budsdynamiceq.data.model.PlacementState.WEARING || placementR == com.benegedeniz.budsdynamiceq.data.model.PlacementState.WEARING)
                         val isBudsTransparencyAllowed = effectiveModel == com.benegedeniz.budsdynamiceq.bluetooth.BudsModel.BUDS_3_PRO || effectiveModel == com.benegedeniz.budsdynamiceq.bluetooth.BudsModel.BUDS_4_PRO
+                        val activeNc = activeNoiseControl ?: NoiseControlMode.OFF
                         controls.forEach { mode ->
-                            val isSelected = activeNoiseControl == mode
+                            val isSelected = activeNc == mode
                             val isModeEnabled = if (!isConnected || !anyInEar) {
                                 false
                             } else if (bothInEar || oneEarbudNoiseControlEnabled) {
@@ -538,15 +542,15 @@ fun BudsScreen(
                             
                             val bgColor by androidx.compose.animation.animateColorAsState(
                                 targetValue = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
-                                animationSpec = androidx.compose.animation.core.tween(300)
+                                animationSpec = androidx.compose.animation.core.tween(300), label = ""
                             )
                             val iconTint by androidx.compose.animation.animateColorAsState(
                                 targetValue = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
-                                animationSpec = androidx.compose.animation.core.tween(300)
+                                animationSpec = androidx.compose.animation.core.tween(300), label = ""
                             )
                             val textColor by androidx.compose.animation.animateColorAsState(
                                 targetValue = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                                animationSpec = androidx.compose.animation.core.tween(300)
+                                animationSpec = androidx.compose.animation.core.tween(300), label = ""
                             )
                             
                             Column(
@@ -684,47 +688,72 @@ fun BudsScreen(
                                     color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
                                 )
                             }
-                            
-                            SoundBalanceCard(
-                                isConnected = isConnected,
-                                placementL = placementL,
-                                placementR = placementR,
-                                stereoBalance = stereoBalance,
-                                onBalanceChange = { viewModel.setStereoBalance(it) },
-                                onBalanceChangeFinished = { viewModel.setStereoBalance(it) },
-                                onSoundBalanceTestClick = onSoundBalanceTestClick
-                            )
                         }
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
             }
-
-            // Voice Detect Switch Card
-            if (effectiveModel.supportsConversationDetection) item {
-                VoiceDetectCard(
-                    isConnected = isConnected,
-                    placementL = placementL,
-                    placementR = placementR,
-                    conversationDetectionEnabled = conversationDetectionEnabled,
-                    onCheckedChange = { viewModel.setConversationDetection(it) }
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
-            // Auto-Pause on Transparency Mode — independent toggle
-            if (effectiveModel.supportsTransparencyNC) {
+            
+            if (effectiveModel.supportsConversationDetection) {
                 item {
-                AutoPauseMediaCard(
-                    isConnected = isConnected,
-                    pauseMediaOnConversation = pauseMediaOnConversation,
-                    onCheckedChange = { rulesViewModel.setPauseMediaOnConversation(it, prefsLocal) }
-                )
-                Spacer(modifier = Modifier.height(16.dp))
+                    VoiceDetectCard(
+                        isConnected = isConnected,
+                        placementL = placementL,
+                        placementR = placementR,
+                        conversationDetectionEnabled = conversationDetectionEnabled,
+                        onCheckedChange = { viewModel.setConversationDetection(it) }
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
-
-            // Wear State Actions Button
+            
+            item {
+                AutoMediaControlsCard(
+                    isConnected = isConnected,
+                    effectiveModel = effectiveModel,
+                    pauseMediaOnConversation = pauseMediaOnConversation,
+                    playMediaOnAnc = playMediaOnAnc,
+                    onPauseMediaChange = { rulesViewModel.setPauseMediaOnConversation(it, prefsLocal) },
+                    onPlayMediaChange = { rulesViewModel.setPlayMediaOnAnc(it, prefsLocal) }
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+            
+            // Sound Options Section
+            item {
+                SectionHeader(
+                    title = stringResource(R.string.sound_options),
+                    modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
+                )
+                EqualizerCard(
+                    isConnected = isConnected,
+                    currentPreset = if (lastMatchedRule == null || lastMatchedRule.preset == EqPreset.DEFAULT) {
+                        manualPreset
+                    } else {
+                        lastMatchedRule.preset
+                    },
+                    isRuleActive = lastMatchedRule != null && lastMatchedRule.preset != EqPreset.IGNORE,
+                    onClick = onEqualizerClick
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+            
+            item {
+                SoundBalanceEntryCard(
+                    isConnected = isConnected,
+                    onClick = { onSoundBalanceTestClick() } // We'll repurpose this callback to open SoundBalanceOptionsScreen
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+            
+            // Device Options Section
+            item {
+                SectionHeader(
+                    title = stringResource(R.string.device_options),
+                    modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
+                )
+            }
+            
             item {
                 WearStateActionsCard(
                     isConnected = isConnected,
@@ -732,8 +761,7 @@ fun BudsScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
             }
-
-            // Fit Test Button
+            
             if (effectiveModel.supportsFitTest) {
                 item {
                     FitTestCard(
@@ -746,7 +774,6 @@ fun BudsScreen(
                 }
             }
             
-            // Find My Earbuds Button
             item {
                 FindMyEarbudsCard(
                     isConnected = isConnected,
@@ -758,6 +785,7 @@ fun BudsScreen(
         PageHeader(
             title = stringResource(R.string.bud_buddy),
             isScrolled = isScrolled,
+            modifier = headerOverlay.headerModifier,
             actionIcon = {
                 val isUpdateAvailable by com.benegedeniz.budsdynamiceq.util.UpdateChecker.isUpdateAvailable.collectAsState()
                 IconButton(
@@ -988,4 +1016,14 @@ fun BudBatteryInfo(label: String, battery: Int, placement: com.benegedeniz.budsd
             Text(text = "${String.format("%.1f", temperature)}°C", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 2.dp))
         }
     }
+}
+
+@Composable
+fun SectionHeader(title: String, modifier: Modifier = Modifier) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.titleMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = modifier.padding(start = 8.dp, bottom = 8.dp)
+    )
 }

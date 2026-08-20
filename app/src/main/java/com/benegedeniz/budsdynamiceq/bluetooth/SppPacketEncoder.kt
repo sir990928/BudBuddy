@@ -5,6 +5,7 @@ object SppPacketEncoder {
     private const val SOM: Byte = 0xFD.toByte()
     private const val EOM: Byte = 0xDD.toByte()
     const val MSG_ID_EQUALIZER: Byte = 0x86.toByte()
+    const val MSG_ID_CUSTOM_EQUALIZE_SEND: Byte = 137.toByte() // 0x89; Buds 3/4 custom 9-band table
     const val MSG_ID_NOISE_CONTROLS: Byte = 0x78.toByte()
     const val MSG_ID_SET_CALL_PATH_CONTROL: Byte = 0x6E.toByte() // 110 (0x6E)
     const val MSG_ID_SET_ANC_WITH_ONE_EARBUD: Byte = 0x6F.toByte() // 111 (0x6F)
@@ -56,6 +57,16 @@ object SppPacketEncoder {
         packet[offset] = EOM
         
         return packet
+    }
+
+    fun buildCustomEqualizerPayload(gains: List<Int>): ByteArray {
+        val clamped = com.benegedeniz.budsdynamiceq.data.model.CustomEqualizer.clamp(gains)
+        val payload = ByteArray(1 + clamped.size)
+        payload[0] = clamped.size.toByte()
+        for (i in clamped.indices) {
+            payload[i + 1] = clamped[i].toByte()
+        }
+        return payload
     }
 
     /**

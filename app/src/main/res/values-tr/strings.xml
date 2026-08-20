@@ -14,6 +14,7 @@
 	<string name="does_not_match_current_song">Çalan şarkıyla eşleşmiyor</string>
 	<string name="fetching_genre">Tür Alınıyor...</string>
 	<string name="equalizer">Ekolayzer</string>
+	<string name="equalizer_disabled_by_rule">Aktif kural tarafından devre dışı bırakıldı</string>
 	<string name="noise_control">Gürültü Kontrolü</string>
 	<string name="grant_system_permissions">Sistem İzinlerini Ver</string>
 	<string name="grant_notification_access">Bildirim Erişimine İzin Ver</string>
@@ -201,12 +202,16 @@
 	<string name="use_ambient_sound_during_calls">Aramalarda Ortam Sesini Kullan</string>
 	<string name="in_ear_detection_for_calls">Aramalarda Kulak İçi Algılama</string>
 	<string name="play_calls_through_earbuds_when_in_ear_s">Aramaları takılıyken kulaklığa, değilken hoparlöre aktar</string>
-	<string name="left_right_sound_balance">Sol/Sağ Ses Dengesi</string>
+	<string name="left_right_sound_balance">Ses Dengesi</string>
+	<string name="sound_options">Ses Seçenekleri</string>
+	<string name="reset_to_center">Ortala</string>
 	<string name="conversation_detection">Konuşma Algılama</string>
 	<string name="automatically_switches_to_ambient_mode_w">Konuştuğunuzda otomatik olarak Ortam Sesi moduna geçer.</string>
 	<string name="requires_both_earbuds_to_be_worn">Her iki kulaklığın da takılı olması gerekir</string>
 	<string name="auto_pause_media">Ortam Sesinde Duraklat</string>
 	<string name="pauses_media_when_ambient_mode_is_trigge">Ortam Sesi modu etkinleştiğinde medyayı duraklatır.</string>
+	<string name="auto_play_on_anc">ANC\'de Oynat</string>
+	<string name="plays_media_when_anc_is_triggered">Aktif Gürültü Engelleme modu etkinleştiğinde medyayı oynatır.</string>
 	<string name="wear_state_actions">Takma Durumu Eylemleri</string>
 	<string name="earbud_fit_test">Kulaklık Uyum Testi</string>
 	<string name="language">Dil</string>
@@ -231,7 +236,7 @@
 	<string name="right_ear_test">Sağ Kulak Testi</string>
 	<string name="now_testing_your_right_ear_n_npress_and_">Şimdi sağ kulağınız test ediliyor.\n\nButona basılı tutun. Sesi duyamadığınız anda parmağınızı çekin.</string>
 	<string name="find_your_perfect_balance">Mükemmel Dengenizi Bulun</string>
-	<string name="this_test_will_determine_the_optimal_lef">Bu test, kulaklarınıza en uygun Sol/Sağ ses dengesini belirler.</string>
+	<string name="this_test_will_determine_the_optimal_lef">Bu test, kulaklarınıza en uygun ses dengesini belirler.</string>
 	<string name="your_media_will_be_paused_and_system_vol">Doğru ölçüm için medya duraklatılacak ve sistem sesi geçici olarak maksimuma çıkarılacaktır.</string>
 	<string name="sensory_warning_this_test_plays_a_contin">Duyusal Uyarı: Bu test kesintisiz 1000 Hz ses çalar. Duyusal hassasiyeti olan kullanıcıların dikkatli olması önerilir.</string>
 	<string name="please_go_to_a_quiet_environment_active_">Lütfen sessiz bir ortama geçin. Test sırasında ANC geçici olarak açılacaktır.</string>
@@ -290,6 +295,11 @@
 	<string name="eq_dynamic">Dinamik</string>
 	<string name="eq_clear">Net</string>
 	<string name="eq_treble_boost">Tiz artırma</string>
+	<string name="eq_custom_1">Özel 1</string>
+	<string name="eq_custom_2">Özel 2</string>
+	<string name="eq_custom_3">Özel 3</string>
+	<string name="equalizer_adjust_hint">Sesi zevkinize göre ayarlayın.</string>
+	<string name="equalizer_custom_unsupported">Bant bazlı ayar Galaxy Buds 3 ve sonraki modellerde kullanılabilir.</string>
 	<string name="nc_default">Varsayılan</string>
 	<string name="nc_ignore">Değiştirme</string>
 	<string name="nc_off">Kapalı</string>
@@ -517,6 +527,10 @@
     <string name="show_toast_rule_match">Kural Eşleştiğinde Bildirim Göster</string>
     <string name="show_toast_rule_match_desc">Bir kural otomatik olarak uygulandığında kısa bir mesaj göster.</string>
     <string name="system_integration">Sistem Entegrasyonu</string>
+    <string name="ignored_media_players">Yok Sayılan Medya Oynatıcılar</string>
+    <string name="ignored_media_players_desc">Asla dinamik EQ kurallarını tetiklememesi gereken medya uygulamalarını seçin.</string>
+    <string name="select_all">Tümünü Seç</string>
+    <string name="deselect_all">Tümünü Kaldır</string>
     <string name="start_on_boot">Cihaz Başlarken Çalıştır</string>
     <string name="start_on_boot_desc">Cihaz açıldığında arka plan servisini otomatik olarak başlat.</string>
     <string name="auto_connect_buds">Kulaklıklara Otomatik Bağlan</string>

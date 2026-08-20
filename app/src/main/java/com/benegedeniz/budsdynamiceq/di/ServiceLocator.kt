@@ -53,6 +53,7 @@ object ServiceLocator {
         _headShakeEnabled.value = prefs.getBoolean("head_shake_enabled", false)
         _requireBothEarbuds.value = prefs.getBoolean("require_both_earbuds", false)
         _pauseMediaOnConversation.value = prefs.getBoolean("pause_media_on_conversation", false)
+        _playMediaOnAnc.value = prefs.getBoolean("play_media_on_anc", false)
     }
 
     fun setHeadShakeEnabled(enabled: Boolean) {
@@ -68,6 +69,13 @@ object ServiceLocator {
 
     fun setPauseMediaOnConversation(enabled: Boolean) {
         _pauseMediaOnConversation.value = enabled
+    }
+
+    private val _playMediaOnAnc = MutableStateFlow(false)
+    val playMediaOnAnc: StateFlow<Boolean> = _playMediaOnAnc.asStateFlow()
+
+    fun setPlayMediaOnAnc(enabled: Boolean) {
+        _playMediaOnAnc.value = enabled
     }
 
     @Volatile

@@ -81,6 +81,7 @@ import com.benegedeniz.budsdynamiceq.service.BudsService
 import androidx.compose.ui.res.stringResource
 import com.benegedeniz.budsdynamiceq.R
 import com.benegedeniz.budsdynamiceq.ui.rules.components.*
+import com.benegedeniz.budsdynamiceq.ui.components.BaseCard
 
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -184,6 +185,8 @@ fun RulesScreen(
         label = "overscrollAnimation"
     )
 
+    val headerOverlay = com.benegedeniz.budsdynamiceq.ui.components.rememberPageHeaderOverlayPadding()
+
     Box(
         modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
     ) {
@@ -200,7 +203,7 @@ fun RulesScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 150.dp)
+                .padding(top = headerOverlay.listTop)
                 .graphicsLayer { alpha = searchHintAlpha },
             contentAlignment = Alignment.Center
         ) {
@@ -238,7 +241,7 @@ fun RulesScreen(
                     .reorderable(listState)
                     .nestedScroll(nestedScrollConnection)
                     .graphicsLayer { translationY = animatedOverscroll * 0.5f },
-                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 140.dp, bottom = 120.dp)
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = headerOverlay.listTop, bottom = 120.dp)
             ) {
                 item {
                     // Active Rule Sub-bar
@@ -335,6 +338,7 @@ fun RulesScreen(
             com.benegedeniz.budsdynamiceq.ui.components.PageHeader(
                 title = stringResource(R.string.music_rules),
                 isScrolled = isScrolled,
+                modifier = headerOverlay.headerModifier,
                 actionIcon = {
                     IconButton(onClick = { showInfoDialog = true }) {
                         Icon(
@@ -418,12 +422,9 @@ fun RuleItem(
         label = "subtitleColor"
     )
 
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = bgColor
-        )
+    BaseCard(
+        modifier = modifier,
+        containerColor = bgColor
     ) {
         Column(
             modifier = Modifier.padding(16.dp).fillMaxWidth().alpha(if (rule.enabled) 1f else 0.5f)
@@ -517,6 +518,9 @@ fun RuleEditScreen(
     var titleSelected by remember { mutableStateOf(false) }
     var artistSelected by remember { mutableStateOf(false) }
     var genreSelected by remember { mutableStateOf(false) }
+
+    val budsController = com.benegedeniz.budsdynamiceq.di.ServiceLocator.provideBudsController(LocalContext.current)
+    val effectiveModel = budsController.effectiveModel.collectAsState().value
 
     val isBadgeSelected = titleSelected || artistSelected || genreSelected
 
@@ -821,7 +825,9 @@ fun RuleEditScreen(
                             onDismissRequest = { expanded = false },
                             modifier = Modifier.background(MaterialTheme.colorScheme.surface)
                         ) {
-                            EqPreset.entries.forEach { preset ->
+                            EqPreset.entries.filter { preset ->
+                                !preset.isCustom || effectiveModel.supportsCustomEqualizer
+                            }.forEach { preset ->
                                 DropdownMenuItem(
                                     text = { Text(stringResource(preset.displayNameRes)) },
                                     onClick = {
@@ -854,8 +860,6 @@ fun RuleEditScreen(
                             onDismissRequest = { ncExpanded = false },
                             modifier = Modifier.background(MaterialTheme.colorScheme.surface)
                         ) {
-                            val budsController = com.benegedeniz.budsdynamiceq.di.ServiceLocator.provideBudsController(androidx.compose.ui.platform.LocalContext.current)
-                            val effectiveModel = budsController.effectiveModel.collectAsState().value
                             NoiseControlMode.entries.filter { (it != NoiseControlMode.ADAPTIVE || effectiveModel.supportsAdaptiveNC) && (it != NoiseControlMode.TRANSPARENT || effectiveModel.supportsTransparencyNC) }.forEach { ncMode ->
                                 DropdownMenuItem(
                                     text = { Text(stringResource(ncMode.displayNameRes)) },

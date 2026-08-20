@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.benegedeniz.budsdynamiceq.R
 import com.benegedeniz.budsdynamiceq.bluetooth.BudsModel
+import com.benegedeniz.budsdynamiceq.data.model.EqPreset
 import com.benegedeniz.budsdynamiceq.data.model.NoiseControlMode
 import com.benegedeniz.budsdynamiceq.data.model.PlacementState
 import com.benegedeniz.budsdynamiceq.ui.components.bounceClick
@@ -33,6 +34,8 @@ import androidx.compose.foundation.clickable
 
 
 
+import com.benegedeniz.budsdynamiceq.ui.components.BaseCard
+    
 @Composable
 fun VoiceDetectCard(
     isConnected: Boolean,
@@ -43,10 +46,8 @@ fun VoiceDetectCard(
     modifier: Modifier = Modifier
 ) {
     val haptic = LocalHapticFeedback.current
-    Card(
-        modifier = modifier.fillMaxWidth().animateContentSize(),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    BaseCard(
+        modifier = modifier.animateContentSize()
     ) {
         Column(modifier = Modifier.fillMaxWidth().padding(vertical = 18.dp)) {
             val bothInEar = isConnected && placementL == PlacementState.WEARING && placementR == PlacementState.WEARING
@@ -104,56 +105,99 @@ fun VoiceDetectCard(
 }
 
 @Composable
-fun AutoPauseMediaCard(
+fun AutoMediaControlsCard(
     isConnected: Boolean,
+    effectiveModel: com.benegedeniz.budsdynamiceq.bluetooth.BudsModel,
     pauseMediaOnConversation: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
+    playMediaOnAnc: Boolean,
+    onPauseMediaChange: (Boolean) -> Unit,
+    onPlayMediaChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val haptic = LocalHapticFeedback.current
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        shape = RoundedCornerShape(24.dp)
+    BaseCard(
+        modifier = modifier
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp)
-                .alpha(if (isConnected) 1f else 0.5f),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Default.Pause,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(24.dp)
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(R.string.auto_pause_media),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+        Column {
+            if (effectiveModel.supportsTransparencyNC) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp)
+                        .alpha(if (isConnected) 1f else 0.5f),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Pause,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.auto_pause_media),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = stringResource(R.string.pauses_media_when_ambient_mode_is_trigge),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Switch(
+                        checked = pauseMediaOnConversation,
+                        onCheckedChange = {
+                            haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                            onPauseMediaChange(it)
+                        },
+                        enabled = isConnected
+                    )
+                }
+                
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 24.dp))
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp)
+                    .alpha(if (isConnected) 1f else 0.5f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.PlayArrow,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp)
                 )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = stringResource(R.string.pauses_media_when_ambient_mode_is_trigge),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                Spacer(modifier = Modifier.width(16.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.auto_play_on_anc),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(R.string.plays_media_when_anc_is_triggered),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Switch(
+                    checked = playMediaOnAnc,
+                    onCheckedChange = {
+                        haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                        onPlayMediaChange(it)
+                    },
+                    enabled = isConnected
                 )
             }
-            Spacer(modifier = Modifier.width(8.dp))
-            Switch(
-                checked = pauseMediaOnConversation,
-                onCheckedChange = {
-                    haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
-                    onCheckedChange(it)
-                },
-                enabled = isConnected
-            )
         }
     }
 }
@@ -164,12 +208,10 @@ fun WearStateActionsCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .bounceClick(enabled = isConnected) { onClick() },
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    BaseCard(
+        modifier = modifier,
+        onClick = { onClick() },
+        enabled = isConnected
     ) {
         Row(
             modifier = Modifier
@@ -211,12 +253,10 @@ fun FitTestCard(
     modifier: Modifier = Modifier
 ) {
     val fitTestEnabled = isConnected && placementL == PlacementState.WEARING && placementR == PlacementState.WEARING
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .bounceClick(enabled = fitTestEnabled) { onClick() },
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    BaseCard(
+        modifier = modifier,
+        onClick = { onClick() },
+        enabled = fitTestEnabled
     ) {
         Row(
             modifier = Modifier
@@ -258,17 +298,75 @@ fun FitTestCard(
 }
 
 @Composable
+fun EqualizerCard(
+    isConnected: Boolean,
+    currentPreset: EqPreset?,
+    isRuleActive: Boolean = false,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    BaseCard(
+        modifier = modifier,
+        onClick = { onClick() },
+        enabled = isConnected && !isRuleActive
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp)
+                .alpha(if (isConnected && !isRuleActive) 1f else 0.5f),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.GraphicEq,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.equalizer),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                if (currentPreset != null && currentPreset != EqPreset.DEFAULT && currentPreset != EqPreset.IGNORE) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(currentPreset.displayNameRes),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                if (isRuleActive) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(R.string.equalizer_disabled_by_rule),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+    }
+}
+
+@Composable
 fun FindMyEarbudsCard(
     isConnected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .bounceClick(enabled = isConnected) { onClick() },
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    BaseCard(
+        modifier = modifier,
+        onClick = { onClick() },
+        enabled = isConnected
     ) {
         Row(
             modifier = Modifier
@@ -302,119 +400,48 @@ fun FindMyEarbudsCard(
 }
 
 @Composable
-fun SoundBalanceCard(
+fun SoundBalanceEntryCard(
     isConnected: Boolean,
-    placementL: PlacementState,
-    placementR: PlacementState,
-    stereoBalance: Int,
-    onBalanceChange: (Int) -> Unit,
-    onBalanceChangeFinished: (Int) -> Unit,
-    onSoundBalanceTestClick: () -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val haptic = LocalHapticFeedback.current
-    var isDraggingBalance by remember { mutableStateOf(false) }
-    var localBalance by remember(stereoBalance) { mutableFloatStateOf(stereoBalance.toFloat()) }
-    var lastSentBalanceTime by remember { mutableLongStateOf(0L) }
-    var lastHapticValue by remember { mutableIntStateOf(stereoBalance) }
-    
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp)
-            .alpha(if (isConnected) 1f else 0.5f)
+    BaseCard(
+        modifier = modifier,
+        onClick = { onClick() },
+        enabled = isConnected
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(bottom = 0.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp)
+                .alpha(if (isConnected) 1f else 0.5f),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = Icons.Default.SwapHoriz,
                 contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.left_right_sound_balance),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(24.dp)
             )
-            Spacer(modifier = Modifier.width(12.dp))
-            Text(
-                text = stringResource(R.string.left_right_sound_balance),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        }
-        
-        Slider(
-            value = if (isDraggingBalance) localBalance else stereoBalance.toFloat(),
-            onValueChange = { newValue ->
-                isDraggingBalance = true
-                val snapped = if (newValue in 15f..17f) {
-                    16f
-                } else {
-                    newValue
-                }
-                
-                val newInt = snapped.toInt()
-                if (newInt != lastHapticValue) {
-                    if (newInt == 16) {
-                        haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
-                    } else {
-                        haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
-                    }
-                    lastHapticValue = newInt
-                }
-                
-                localBalance = snapped
-                
-                val currentTime = System.currentTimeMillis()
-                if (currentTime - lastSentBalanceTime > 300) {
-                    onBalanceChange(newInt)
-                    lastSentBalanceTime = currentTime
-                }
-            },
-            onValueChangeFinished = {
-                isDraggingBalance = false
-                onBalanceChangeFinished(localBalance.toInt())
-            },
-            valueRange = 0f..32f,
-            enabled = isConnected,
-            modifier = Modifier.padding(horizontal = 8.dp)
-        )
-        
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(stringResource(R.string.l), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(
-                text = run {
-                    val current = if (isDraggingBalance) localBalance.toInt() else stereoBalance
-                    when (current) {
-                        16 -> stringResource(R.string.buds_balanced)
-                        in 0..15 -> stringResource(R.string.buds_battery_l, ((16 - current) / 16f * 100).toInt())
-                        else -> stringResource(R.string.buds_battery_r, ((current - 16) / 16f * 100).toInt())
-                    }
-                },
-                style = MaterialTheme.typography.labelSmall, 
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(stringResource(R.string.r), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-        
-        Spacer(modifier = Modifier.height(12.dp))
-        
-        val bothInEar = isConnected && placementL == PlacementState.WEARING && placementR == PlacementState.WEARING
-        
-        OutlinedButton(
-            onClick = onSoundBalanceTestClick,
-            enabled = bothInEar,
-            modifier = Modifier.fillMaxWidth().height(42.dp).bounceClick(enabled = bothInEar),
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            Icon(Icons.Default.Hearing, contentDescription = null, modifier = Modifier.size(18.dp))
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(stringResource(R.string.take_hearing_test), fontSize = 14.sp, fontWeight = FontWeight.Medium)
         }
     }
 }
+
+
 
 @Composable
 fun DoubleTapEdgeCard(
@@ -634,12 +661,10 @@ fun NoiseControlsCard(
     onNoiseControlSelect: (NoiseControlMode) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth().animateContentSize(
+    BaseCard(
+        modifier = modifier.animateContentSize(
             animationSpec = spring(stiffness = Spring.StiffnessHigh)
-        ),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        )
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -734,11 +759,7 @@ fun FeatureToggleCard(
     modifier: Modifier = Modifier
 ) {
     val haptic = LocalHapticFeedback.current
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-    ) {
+    BaseCard(modifier = modifier) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -789,12 +810,10 @@ fun ActionButtonCard(
     enabled: Boolean,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .bounceClick(enabled = enabled) { onClick() },
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    BaseCard(
+        modifier = modifier,
+        onClick = { onClick() },
+        enabled = enabled
     ) {
         Row(
             modifier = Modifier

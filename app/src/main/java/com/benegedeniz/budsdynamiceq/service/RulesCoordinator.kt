@@ -9,8 +9,10 @@ import com.benegedeniz.budsdynamiceq.media.MediaObserver
 import com.benegedeniz.budsdynamiceq.rules.RulesEngine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 
+@OptIn(kotlinx.coroutines.FlowPreview::class)
 class RulesCoordinator(
     private val context: Context,
     private val scope: CoroutineScope,
@@ -22,14 +24,13 @@ class RulesCoordinator(
 
     fun start() {
         scope.launch {
-            var lastSongWithDefault: String? = null
+            var lastPushedEq: EqPreset? = null
+            var lastPushedNc: NoiseControlMode? = null
             var wasConnected = false
             var wasBothInEar = false
-            var lastAppliedManualEq: EqPreset? = null
-            var lastAppliedManualNc: NoiseControlMode? = null
 
             val ruleStateFlow = combine(
-                mediaObserver.currentMetadata,
+                mediaObserver.currentMetadata.debounce(400L),
                 rulesRepository.rules,
                 budsController.manualPreset,
                 budsController.manualNoiseControl
@@ -76,56 +77,41 @@ class RulesCoordinator(
                 val manualNc = state.ruleState.manualNc
 
                 val matchingRule = rulesEngine.evaluate(metadata, state.ruleState.rulesList)
-                if (matchingRule != null) {
-                    val activeRuleInheritsEq = matchingRule.preset == EqPreset.DEFAULT
-                    val activeRuleInheritsNc = matchingRule.noiseControl == NoiseControlMode.DEFAULT
+                
+                val eqToSend = if (matchingRule != null && matchingRule.preset != EqPreset.DEFAULT) matchingRule.preset else manualEq
+                val ncToSend = if (matchingRule != null && matchingRule.noiseControl != NoiseControlMode.DEFAULT) matchingRule.noiseControl else manualNc
+                
+                val settingsChanged = eqToSend != lastPushedEq || ncToSend != lastPushedNc
+                
+                if (settingsChanged || justConnected || justPutBothInEar) {
+                    budsController.setLastMatchedRule(matchingRule)
+                    if (eqToSend != null) budsController.sendEqualizer(eqToSend)
+                    if (ncToSend != null) budsController.sendNoiseControl(ncToSend)
                     
-                    val ruleDefaultChanged = (activeRuleInheritsEq && lastAppliedManualEq != manualEq) || 
-                                             (activeRuleInheritsNc && lastAppliedManualNc != manualNc)
-                                             
-                    val eqToSend = if (activeRuleInheritsEq) manualEq else matchingRule.preset
-                    val ncToSend = if (activeRuleInheritsNc) manualNc else matchingRule.noiseControl
-                                             
-                    if (justConnected || justPutBothInEar || budsController.lastMatchedRule.value != matchingRule || ruleDefaultChanged) {
-                        val newRuleMatched = budsController.lastMatchedRule.value != matchingRule
-                        budsController.setLastMatchedRule(matchingRule)
-                        if (eqToSend != null) budsController.sendEqualizer(eqToSend)
-                        if (ncToSend != null) budsController.sendNoiseControl(ncToSend)
-                        
-                        if (newRuleMatched && !justConnected && !justPutBothInEar) {
-                            val prefs = context.getSharedPreferences("BudsPrefs", Context.MODE_PRIVATE)
-                            if (prefs.getBoolean("rule_toast_enabled", true)) {
-                                android.os.Handler(android.os.Looper.getMainLooper()).post {
-                                    val eqName = eqToSend?.let { context.getString(it.displayNameRes) } ?: ""
-                                    val ncName = ncToSend?.let { context.getString(it.displayNameRes) } ?: ""
-                                    val toastMessage = listOf(eqName, ncName).filter { it.isNotEmpty() }.joinToString(" & ")
-                                    val finalMessage = context.getString(
-                                        com.benegedeniz.budsdynamiceq.R.string.rule_applied_toast,
-                                        toastMessage.ifEmpty { matchingRule.keyword }
-                                    )
-                                    android.widget.Toast.makeText(context, finalMessage, android.widget.Toast.LENGTH_SHORT).show()
-                                }
+                    if (settingsChanged && !justConnected && !justPutBothInEar) {
+                        val prefs = context.getSharedPreferences("BudsPrefs", Context.MODE_PRIVATE)
+                        if (prefs.getBoolean("rule_toast_enabled", true)) {
+                            android.os.Handler(android.os.Looper.getMainLooper()).post {
+                                val localizedContext = com.benegedeniz.budsdynamiceq.util.LanguageUtils.setLocale(context)
+                                val eqName = eqToSend?.let { localizedContext.getString(it.displayNameRes) } ?: ""
+                                val ncName = ncToSend?.let { localizedContext.getString(it.displayNameRes) } ?: ""
+                                val toastMessage = listOf(eqName, ncName).filter { it.isNotEmpty() }.joinToString(" & ")
+                                
+                                val triggerName = matchingRule?.keyword ?: localizedContext.getString(com.benegedeniz.budsdynamiceq.R.string.global_defaults)
+                                val finalMessage = localizedContext.getString(
+                                    com.benegedeniz.budsdynamiceq.R.string.rule_applied_toast,
+                                    toastMessage.ifEmpty { triggerName }
+                                )
+                                android.widget.Toast.makeText(localizedContext, finalMessage, android.widget.Toast.LENGTH_SHORT).show()
                             }
                         }
-                        
-                        lastAppliedManualEq = manualEq
-                        lastAppliedManualNc = manualNc
                     }
-                    lastSongWithDefault = null
-                } else {
-                    val justDroppedOut = budsController.lastMatchedRule.value != null
-                    budsController.setLastMatchedRule(null)
                     
-                    val songDisplayString = metadata?.displayString ?: ""
-                    val defaultChanged = lastAppliedManualEq != manualEq || lastAppliedManualNc != manualNc
-                    if (justConnected || justDroppedOut || justPutBothInEar || lastSongWithDefault != songDisplayString || defaultChanged) {
-                        if (manualEq != null) budsController.sendEqualizer(manualEq)
-                        if (manualNc != null) budsController.sendNoiseControl(manualNc)
-                        
-                        lastSongWithDefault = songDisplayString
-                        lastAppliedManualEq = manualEq
-                        lastAppliedManualNc = manualNc
-                    }
+                    lastPushedEq = eqToSend
+                    lastPushedNc = ncToSend
+                } else if (budsController.lastMatchedRule.value != matchingRule) {
+                    // Update UI state even if settings didn't change, so Equalizer card disables correctly
+                    budsController.setLastMatchedRule(matchingRule)
                 }
             }
         }
