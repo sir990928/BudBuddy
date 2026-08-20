@@ -81,6 +81,7 @@ import com.benegedeniz.budsdynamiceq.service.BudsService
 import androidx.compose.ui.res.stringResource
 import com.benegedeniz.budsdynamiceq.R
 import com.benegedeniz.budsdynamiceq.ui.rules.components.*
+import com.benegedeniz.budsdynamiceq.ui.components.BaseCard
 
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -421,12 +422,9 @@ fun RuleItem(
         label = "subtitleColor"
     )
 
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = bgColor
-        )
+    BaseCard(
+        modifier = modifier,
+        containerColor = bgColor
     ) {
         Column(
             modifier = Modifier.padding(16.dp).fillMaxWidth().alpha(if (rule.enabled) 1f else 0.5f)

@@ -20,6 +20,7 @@ import com.benegedeniz.budsdynamiceq.bluetooth.BudsModel
 import com.benegedeniz.budsdynamiceq.data.model.EqPreset
 import com.benegedeniz.budsdynamiceq.data.model.EqRule
 import com.benegedeniz.budsdynamiceq.data.model.NoiseControlMode
+import com.benegedeniz.budsdynamiceq.ui.components.BaseCard
 
 @Composable
 fun ActiveRuleCard(
@@ -88,10 +89,8 @@ fun GlobalDefaultsCard(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(start = 8.dp, bottom = 8.dp, top = 24.dp)
         )
-        Card(
-            modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
-            shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        BaseCard(
+            modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp)
         ) {
             Column(modifier = Modifier.padding(20.dp)) {
                 Row(

@@ -53,6 +53,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.zIndex
+import com.benegedeniz.budsdynamiceq.ui.components.BaseCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -561,16 +563,11 @@ fun GestureCard(
         }
     }
 
-    Card(
+    BaseCard(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp)
-            .bounceClick { onEditFlow() },
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = containerColor.value,
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            .padding(horizontal = 16.dp, vertical = 6.dp),
+        containerColor = containerColor.value,
+        onClick = { onEditFlow() }
     ) {
         Row(
             modifier = Modifier
@@ -777,16 +774,13 @@ fun LivePreviewSection(
     var debugExpanded by remember { mutableStateOf(false) }
 
     // Active IMU Status (Debug) Card
-    Card(
+    BaseCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 4.dp)
             .animateContentSize()
             .clickable { debugExpanded = !debugExpanded },
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-        )
+        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
     ) {
         Column(
             modifier = Modifier.padding(12.dp)
@@ -857,14 +851,11 @@ fun LivePreviewSection(
         exit = androidx.compose.animation.shrinkVertically() + androidx.compose.animation.fadeOut()
     ) {
         if (matchedNoise != null) {
-            Card(
+            BaseCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp, vertical = 4.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.8f)
-                )
+                containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.8f)
             ) {
                 Row(
                     modifier = Modifier
@@ -971,8 +962,8 @@ fun GesturesIntroDialog(onDismiss: () -> Unit) {
                                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
                             )
                             Spacer(modifier = Modifier.height(24.dp))
-                            Card(
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
+                            BaseCard(
+                                containerColor = MaterialTheme.colorScheme.errorContainer
                             ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
                                     Text(stringResource(R.string.spatial_audio_warning),

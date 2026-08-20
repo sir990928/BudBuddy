@@ -34,6 +34,8 @@ import androidx.compose.foundation.clickable
 
 
 
+import com.benegedeniz.budsdynamiceq.ui.components.BaseCard
+    
 @Composable
 fun VoiceDetectCard(
     isConnected: Boolean,
@@ -44,10 +46,8 @@ fun VoiceDetectCard(
     modifier: Modifier = Modifier
 ) {
     val haptic = LocalHapticFeedback.current
-    Card(
-        modifier = modifier.fillMaxWidth().animateContentSize(),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    BaseCard(
+        modifier = modifier.animateContentSize()
     ) {
         Column(modifier = Modifier.fillMaxWidth().padding(vertical = 18.dp)) {
             val bothInEar = isConnected && placementL == PlacementState.WEARING && placementR == PlacementState.WEARING
@@ -112,12 +112,8 @@ fun AutoPauseMediaCard(
     modifier: Modifier = Modifier
 ) {
     val haptic = LocalHapticFeedback.current
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        shape = RoundedCornerShape(24.dp)
+    BaseCard(
+        modifier = modifier
     ) {
         Row(
             modifier = Modifier
@@ -165,12 +161,10 @@ fun WearStateActionsCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .bounceClick(enabled = isConnected) { onClick() },
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    BaseCard(
+        modifier = modifier,
+        onClick = { onClick() },
+        enabled = isConnected
     ) {
         Row(
             modifier = Modifier
@@ -212,12 +206,10 @@ fun FitTestCard(
     modifier: Modifier = Modifier
 ) {
     val fitTestEnabled = isConnected && placementL == PlacementState.WEARING && placementR == PlacementState.WEARING
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .bounceClick(enabled = fitTestEnabled) { onClick() },
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    BaseCard(
+        modifier = modifier,
+        onClick = { onClick() },
+        enabled = fitTestEnabled
     ) {
         Row(
             modifier = Modifier
@@ -266,12 +258,10 @@ fun EqualizerCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .bounceClick(enabled = isConnected && !isRuleActive) { onClick() },
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    BaseCard(
+        modifier = modifier,
+        onClick = { onClick() },
+        enabled = isConnected && !isRuleActive
     ) {
         Row(
             modifier = Modifier
@@ -326,12 +316,10 @@ fun FindMyEarbudsCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .bounceClick(enabled = isConnected) { onClick() },
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    BaseCard(
+        modifier = modifier,
+        onClick = { onClick() },
+        enabled = isConnected
     ) {
         Row(
             modifier = Modifier
@@ -697,12 +685,10 @@ fun NoiseControlsCard(
     onNoiseControlSelect: (NoiseControlMode) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth().animateContentSize(
+    BaseCard(
+        modifier = modifier.animateContentSize(
             animationSpec = spring(stiffness = Spring.StiffnessHigh)
-        ),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        )
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -797,11 +783,7 @@ fun FeatureToggleCard(
     modifier: Modifier = Modifier
 ) {
     val haptic = LocalHapticFeedback.current
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-    ) {
+    BaseCard(modifier = modifier) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -852,12 +834,10 @@ fun ActionButtonCard(
     enabled: Boolean,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .bounceClick(enabled = enabled) { onClick() },
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    BaseCard(
+        modifier = modifier,
+        onClick = { onClick() },
+        enabled = enabled
     ) {
         Row(
             modifier = Modifier
