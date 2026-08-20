@@ -135,6 +135,21 @@ class BudsService : Service() {
             wearStateRepo.loadActions()
         }
 
+        scope.launch {
+            delay(2000)
+            combine(
+                budsController.isConnected,
+                budsController.isConnecting
+            ) { connected, connecting ->
+                Pair(connected, connecting)
+            }.collect { (connected, connecting) ->
+                if (!connected && !connecting) {
+                    Log.i(TAG, "Not connected and not connecting, stopping service.")
+                    stopSelf()
+                }
+            }
+        }
+
         val gestureCoordinator = GestureCoordinator(
             scope = scope,
             budsController = budsController,
@@ -193,9 +208,10 @@ class BudsService : Service() {
             gestureDetector.detectedGesture.collect { gesture ->
                 try {
                     if (gestureDetector.isTrainingMode) return@collect
-                    transientNotificationFlow.value = getString(R.string.service_gesture_detected) to getString(R.string.service_flow_sequence, gesture.name)
+                    val localizedContext = com.benegedeniz.budsdynamiceq.util.LanguageUtils.setLocale(this@BudsService)
+                    transientNotificationFlow.value = localizedContext.getString(R.string.service_gesture_detected) to localizedContext.getString(R.string.service_flow_sequence, gesture.name)
                     actionExecutor.execute(gesture.actions, gesture.playChime)
-                    transientNotificationFlow.value = getString(R.string.service_gesture_detected) to getString(R.string.service_flow_complete, gesture.name)
+                    transientNotificationFlow.value = localizedContext.getString(R.string.service_gesture_detected) to localizedContext.getString(R.string.service_flow_complete, gesture.name)
                     delay(1000)
                     transientNotificationFlow.value = null
                 } catch (e: Exception) {
@@ -220,18 +236,22 @@ class BudsService : Service() {
             }
         }
 
-        // Handle conversation mode (pause on transparency)
+        // Handle conversation mode (pause on transparency) and auto play on ANC
+        val playMediaOnAncFlow = ServiceLocator.playMediaOnAnc
         scope.launch {
             var previousNcMode: NoiseControlMode? = null
             combine(
                 budsController.activeNoiseControl,
-                pauseMediaOnConversationFlow
-            ) { ncMode, pauseOnTransparency ->
-                Pair(ncMode, pauseOnTransparency)
-            }.collect { (ncMode, pauseOnTransparency) ->
-                if (pauseOnTransparency && previousNcMode != null && ncMode != previousNcMode) {
-                    if (ncMode == NoiseControlMode.TRANSPARENT) {
+                pauseMediaOnConversationFlow,
+                playMediaOnAncFlow
+            ) { ncMode, pauseOnTransparency, playOnAnc ->
+                Triple(ncMode, pauseOnTransparency, playOnAnc)
+            }.collect { (ncMode, pauseOnTransparency, playOnAnc) ->
+                if (previousNcMode != null && ncMode != previousNcMode) {
+                    if (pauseOnTransparency && ncMode == NoiseControlMode.TRANSPARENT) {
                         actionExecutor.triggerPause()
+                    } else if (playOnAnc && ncMode == NoiseControlMode.NOISE_CANCELLATION) {
+                        actionExecutor.triggerPlay()
                     }
                 }
                 previousNcMode = ncMode

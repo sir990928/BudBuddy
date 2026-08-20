@@ -38,6 +38,7 @@ import com.benegedeniz.budsdynamiceq.ui.theme.StatusErrorRed
 import com.benegedeniz.budsdynamiceq.ui.components.SearchBarInput
 import com.benegedeniz.budsdynamiceq.ui.headshake.components.*
 import com.benegedeniz.budsdynamiceq.ui.components.bounceClick
+import com.benegedeniz.budsdynamiceq.ui.components.rememberPageHeaderOverlayPadding
 import com.benegedeniz.budsdynamiceq.data.model.FitTestResult
 import com.benegedeniz.budsdynamiceq.data.model.GestureAction
 import com.benegedeniz.budsdynamiceq.data.model.getDisplayName
@@ -52,6 +53,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.zIndex
+import com.benegedeniz.budsdynamiceq.ui.components.BaseCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,6 +101,7 @@ fun HeadShakeScreen(
 
     val listState = androidx.compose.foundation.lazy.rememberLazyListState()
     val isScrolled by remember { derivedStateOf { listState.firstVisibleItemIndex > 0 || listState.firstVisibleItemScrollOffset > 20 } }
+    val headerOverlay = rememberPageHeaderOverlayPadding()
     
 
 
@@ -168,7 +172,7 @@ fun HeadShakeScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 150.dp)
+                        .padding(top = headerOverlay.listTop)
                         .graphicsLayer { alpha = searchHintAlpha },
                     contentAlignment = Alignment.Center
                 ) {
@@ -199,7 +203,7 @@ fun HeadShakeScreen(
                 LazyColumn(
                     state = listState,
                     modifier = Modifier.fillMaxSize().nestedScroll(nestedScrollConnection).graphicsLayer { translationY = animatedOverscroll * 0.5f },
-                    contentPadding = PaddingValues(bottom = 120.dp, top = 140.dp)
+                    contentPadding = PaddingValues(bottom = 120.dp, top = headerOverlay.listTop)
                 ) {
 
                 item {
@@ -441,6 +445,7 @@ fun HeadShakeScreen(
         com.benegedeniz.budsdynamiceq.ui.components.PageHeader(
             title = stringResource(R.string.gestures),
             isScrolled = isScrolled,
+            modifier = headerOverlay.headerModifier,
             actionIcon = {
                 Row {
                     IconButton(onClick = { showInfoDialog = true }) {
@@ -558,16 +563,11 @@ fun GestureCard(
         }
     }
 
-    Card(
+    BaseCard(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp)
-            .bounceClick { onEditFlow() },
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = containerColor.value,
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            .padding(horizontal = 16.dp, vertical = 6.dp),
+        containerColor = containerColor.value,
+        onClick = { onEditFlow() }
     ) {
         Row(
             modifier = Modifier
@@ -774,16 +774,13 @@ fun LivePreviewSection(
     var debugExpanded by remember { mutableStateOf(false) }
 
     // Active IMU Status (Debug) Card
-    Card(
+    BaseCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 4.dp)
             .animateContentSize()
             .clickable { debugExpanded = !debugExpanded },
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-        )
+        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
     ) {
         Column(
             modifier = Modifier.padding(12.dp)
@@ -854,14 +851,11 @@ fun LivePreviewSection(
         exit = androidx.compose.animation.shrinkVertically() + androidx.compose.animation.fadeOut()
     ) {
         if (matchedNoise != null) {
-            Card(
+            BaseCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp, vertical = 4.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.8f)
-                )
+                containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.8f)
             ) {
                 Row(
                     modifier = Modifier
@@ -968,8 +962,8 @@ fun GesturesIntroDialog(onDismiss: () -> Unit) {
                                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
                             )
                             Spacer(modifier = Modifier.height(24.dp))
-                            Card(
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
+                            BaseCard(
+                                containerColor = MaterialTheme.colorScheme.errorContainer
                             ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
                                     Text(stringResource(R.string.spatial_audio_warning),

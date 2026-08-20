@@ -14,6 +14,7 @@
 	<string name="does_not_match_current_song">Does not match current song</string>
 	<string name="fetching_genre">Fetching Genre...</string>
 	<string name="equalizer">Equalizer</string>
+	<string name="equalizer_disabled_by_rule">Disabled by active rule</string>
 	<string name="noise_control">Noise Control</string>
 	<string name="grant_system_permissions">Grant System Permissions</string>
 	<string name="grant_notification_access">Grant Notification Access</string>
@@ -201,12 +202,16 @@
 	<string name="use_ambient_sound_during_calls">Use ambient sound during calls</string>
 	<string name="in_ear_detection_for_calls">In-ear detection for calls</string>
 	<string name="play_calls_through_earbuds_when_in_ear_s">Play calls through earbuds when in ear, speaker when not</string>
-	<string name="left_right_sound_balance">Left/Right Sound Balance</string>
+	<string name="left_right_sound_balance">Sound Balance</string>
+	<string name="sound_options">Sound Options</string>
+	<string name="reset_to_center">Reset to Center</string>
 	<string name="conversation_detection">Conversation Detection</string>
 	<string name="automatically_switches_to_ambient_mode_w">Automatically switches to Ambient mode when you speak.</string>
 	<string name="requires_both_earbuds_to_be_worn">Requires both earbuds to be worn</string>
 	<string name="auto_pause_media">Pause on Transparency</string>
 	<string name="pauses_media_when_ambient_mode_is_trigge">Pauses media whenever Transparency mode is activated.</string>
+	<string name="auto_play_on_anc">Play on ANC</string>
+	<string name="plays_media_when_anc_is_triggered">Plays media whenever Active Noise Cancelling mode is activated.</string>
 	<string name="wear_state_actions">Wear State Actions</string>
 	<string name="earbud_fit_test">Earbud Fit Test</string>
 	<string name="language">Language</string>
@@ -231,7 +236,7 @@
 	<string name="right_ear_test">Right Ear Test</string>
 	<string name="now_testing_your_right_ear_n_npress_and_">Now testing your right ear.\n\nPress and hold the button. Release your finger the exact moment you can no longer hear the tone.</string>
 	<string name="find_your_perfect_balance">Find your perfect balance</string>
-	<string name="this_test_will_determine_the_optimal_lef">This test will determine the optimal Left/Right sound balance tailored specifically for your ears.</string>
+	<string name="this_test_will_determine_the_optimal_lef">This test will determine the optimal sound balance tailored specifically for your ears.</string>
 	<string name="your_media_will_be_paused_and_system_vol">Your media will be paused and system volume will be temporarily maximized for accuracy.</string>
 	<string name="sensory_warning_this_test_plays_a_contin">Sensory Warning: This test plays a continuous 1000Hz tone. Users with sensory processing differences or autism should proceed with caution.</string>
 	<string name="please_go_to_a_quiet_environment_active_">Please go to a quiet environment. Active Noise Canceling (ANC) will be temporarily turned on during the test.</string>
@@ -291,6 +296,11 @@
 	<string name="eq_dynamic">Dynamic</string>
 	<string name="eq_clear">Clear</string>
 	<string name="eq_treble_boost">Treble boost</string>
+	<string name="eq_custom_1">Custom 1</string>
+	<string name="eq_custom_2">Custom 2</string>
+	<string name="eq_custom_3">Custom 3</string>
+	<string name="equalizer_adjust_hint">Adjust the sound to your taste.</string>
+	<string name="equalizer_custom_unsupported">Per-band tuning is available on Galaxy Buds 3 and newer.</string>
 	<string name="nc_default">Default</string>
 	<string name="nc_ignore">Don\'t Change</string>
 	<string name="nc_off">Off</string>
@@ -517,6 +527,10 @@
     <string name="show_toast_rule_match">Show Toast on Rule Match</string>
     <string name="show_toast_rule_match_desc">Show a brief message when a rule automatically applies.</string>
     <string name="system_integration">System Integration</string>
+    <string name="ignored_media_players">Ignored Media Players</string>
+    <string name="ignored_media_players_desc">Select media apps that should never trigger dynamic EQ rules.</string>
+    <string name="select_all">Select All</string>
+    <string name="deselect_all">Deselect All</string>
     <string name="start_on_boot">Start on Boot</string>
     <string name="start_on_boot_desc">Start the background service automatically when the device turns on.</string>
     <string name="auto_connect_buds">Auto-Connect to Buds</string>

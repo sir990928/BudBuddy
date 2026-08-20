@@ -40,6 +40,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.benegedeniz.budsdynamiceq.R
 import com.benegedeniz.budsdynamiceq.di.ServiceLocator
 import com.benegedeniz.budsdynamiceq.ui.balance.SoundBalanceTestScreen
+import com.benegedeniz.budsdynamiceq.ui.balance.SoundBalanceOptionsScreen
 import com.benegedeniz.budsdynamiceq.ui.buds.BudsScreen
 import com.benegedeniz.budsdynamiceq.ui.fittest.FitTestScreen
 import com.benegedeniz.budsdynamiceq.ui.headshake.HeadShakeScreen
@@ -53,7 +54,7 @@ import com.benegedeniz.budsdynamiceq.ui.wearstate.WearStateViewModel
 import kotlinx.coroutines.launch
 
 // Sub-screen enum for flag-based navigation (no NavHost lifecycle transitions)
-private enum class SubScreen { NONE, FIT_TEST, WEAR_STATE, SOUND_BALANCE, SETTINGS, FIND_MY_BUDS }
+private enum class SubScreen { NONE, FIT_TEST, WEAR_STATE, SOUND_BALANCE_OPTIONS, SOUND_BALANCE_TEST, SETTINGS, FIND_MY_BUDS, EQUALIZER }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -165,9 +166,10 @@ fun MainScreen() {
                         headShakeViewModel = headShakeViewModel,
                         onFitTestClick = { activeSubScreen = SubScreen.FIT_TEST },
                         onWearStateClick = { activeSubScreen = SubScreen.WEAR_STATE },
-                        onSoundBalanceTestClick = { activeSubScreen = SubScreen.SOUND_BALANCE },
+                        onSoundBalanceTestClick = { activeSubScreen = SubScreen.SOUND_BALANCE_OPTIONS },
                         onSettingsClick = { activeSubScreen = SubScreen.SETTINGS },
                         onFindMyBudsClick = { activeSubScreen = SubScreen.FIND_MY_BUDS },
+                        onEqualizerClick = { activeSubScreen = SubScreen.EQUALIZER },
                         onOpenSearch = { isAppSearchVisible = true },
                         modifier = Modifier.fillMaxSize()
                     )
@@ -225,20 +227,34 @@ fun MainScreen() {
             }
 
             // ── Sub-screen overlays (flag-based, no NavHost) ───────────────────
-            AnimatedVisibility(
-                visible = activeSubScreen != SubScreen.NONE,
-                enter = slideInHorizontally(
-                    initialOffsetX = { it },
-                    animationSpec = spring(stiffness = Spring.StiffnessLow)
-                ) + fadeIn(),
-                exit = slideOutHorizontally(
-                    targetOffsetX = { it },
-                    animationSpec = spring(stiffness = Spring.StiffnessLow)
-                ) + fadeOut()
-            ) {
+            AnimatedContent(
+                targetState = activeSubScreen,
+                transitionSpec = {
+                    if (initialState == SubScreen.NONE && targetState != SubScreen.NONE) {
+                        slideInHorizontally(initialOffsetX = { it }, animationSpec = spring(stiffness = Spring.StiffnessLow))
+                            .togetherWith(ExitTransition.KeepUntilTransitionsFinished)
+                            .apply { targetContentZIndex = 1f }
+                    } else if (initialState != SubScreen.NONE && targetState == SubScreen.NONE) {
+                        EnterTransition.None
+                            .togetherWith(slideOutHorizontally(targetOffsetX = { it }, animationSpec = spring(stiffness = Spring.StiffnessLow)))
+                            .apply { targetContentZIndex = -1f }
+                    } else {
+                        val isPush = targetState == SubScreen.SOUND_BALANCE_TEST
+                        if (isPush) {
+                            slideInHorizontally(initialOffsetX = { it }, animationSpec = spring(stiffness = Spring.StiffnessLow))
+                                .togetherWith(slideOutHorizontally(targetOffsetX = { -it / 3 }, animationSpec = spring(stiffness = Spring.StiffnessLow)))
+                                .apply { targetContentZIndex = 1f }
+                        } else {
+                            slideInHorizontally(initialOffsetX = { -it / 3 }, animationSpec = spring(stiffness = Spring.StiffnessLow))
+                                .togetherWith(slideOutHorizontally(targetOffsetX = { it }, animationSpec = spring(stiffness = Spring.StiffnessLow)))
+                                .apply { targetContentZIndex = -1f }
+                        }
+                    }
+                },
+                label = "subScreenTransition"
+            ) { targetScreen ->
                 Box(modifier = Modifier.fillMaxSize()) {
-                    // Use lastVisibleSubScreen so content stays rendered during exit animation
-                    when (lastVisibleSubScreen) {
+                    when (targetScreen) {
                         SubScreen.FIT_TEST -> FitTestScreen(
                             viewModel = budsViewModel,
                             onBack = { activeSubScreen = SubScreen.NONE },
@@ -249,9 +265,15 @@ fun MainScreen() {
                             onBack = { activeSubScreen = SubScreen.NONE },
                             modifier = Modifier.fillMaxSize()
                         )
-                        SubScreen.SOUND_BALANCE -> SoundBalanceTestScreen(
+                        SubScreen.SOUND_BALANCE_OPTIONS -> SoundBalanceOptionsScreen(
                             viewModel = budsViewModel,
                             onBack = { activeSubScreen = SubScreen.NONE },
+                            onTakeTestClick = { activeSubScreen = SubScreen.SOUND_BALANCE_TEST },
+                            modifier = Modifier.fillMaxSize()
+                        )
+                        SubScreen.SOUND_BALANCE_TEST -> SoundBalanceTestScreen(
+                            viewModel = budsViewModel,
+                            onBack = { activeSubScreen = SubScreen.SOUND_BALANCE_OPTIONS },
                             modifier = Modifier.fillMaxSize()
                         )
                         SubScreen.SETTINGS -> AppSettingsScreen(
@@ -260,6 +282,11 @@ fun MainScreen() {
                         )
                         SubScreen.FIND_MY_BUDS -> com.benegedeniz.budsdynamiceq.ui.findmybuds.FindMyBudsScreen(
                             viewModel = budsViewModel,
+                            onBack = { activeSubScreen = SubScreen.NONE },
+                            modifier = Modifier.fillMaxSize()
+                        )
+                        SubScreen.EQUALIZER -> com.benegedeniz.budsdynamiceq.ui.equalizer.EqualizerScreen(
+                            viewModel = rulesViewModel,
                             onBack = { activeSubScreen = SubScreen.NONE },
                             modifier = Modifier.fillMaxSize()
                         )
@@ -281,8 +308,9 @@ fun MainScreen() {
             headShakeViewModel = headShakeViewModel,
             onFitTestClick = { activeSubScreen = SubScreen.FIT_TEST },
             onWearStateClick = { activeSubScreen = SubScreen.WEAR_STATE },
-            onSoundBalanceTestClick = { activeSubScreen = SubScreen.SOUND_BALANCE },
-            onFindMyBudsClick = { activeSubScreen = SubScreen.FIND_MY_BUDS }
+            onSoundBalanceTestClick = { activeSubScreen = SubScreen.SOUND_BALANCE_OPTIONS },
+            onFindMyBudsClick = { activeSubScreen = SubScreen.FIND_MY_BUDS },
+            onEqualizerClick = { activeSubScreen = SubScreen.EQUALIZER }
         )
 
         // ── Dialogs ────────────────────────────────────────────────────────

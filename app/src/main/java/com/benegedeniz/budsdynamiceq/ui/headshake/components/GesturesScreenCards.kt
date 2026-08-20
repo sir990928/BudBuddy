@@ -35,6 +35,7 @@ import com.benegedeniz.budsdynamiceq.R
 import com.benegedeniz.budsdynamiceq.data.model.HeadGesture
 import com.benegedeniz.budsdynamiceq.ui.theme.StatusActiveGreen
 import com.benegedeniz.budsdynamiceq.ui.theme.StatusErrorRed
+import com.benegedeniz.budsdynamiceq.ui.components.BaseCard
 
 @Composable
 fun GesturesStatusCard(
@@ -48,14 +49,9 @@ fun GesturesStatusCard(
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+    BaseCard(
+        modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+        containerColor = MaterialTheme.colorScheme.surfaceVariant
     ) {
         Row(
             modifier = Modifier
@@ -107,12 +103,9 @@ fun SpatialAudioConflictCard(
     onRetryClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
-        shape = RoundedCornerShape(16.dp)
+    BaseCard(
+        modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+        containerColor = MaterialTheme.colorScheme.errorContainer
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -148,12 +141,9 @@ fun SpatialAudioConflictCard(
 fun DoubleTapEdgeConflictCard(
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer),
-        shape = RoundedCornerShape(16.dp)
+    BaseCard(
+        modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+        containerColor = MaterialTheme.colorScheme.errorContainer
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -182,16 +172,13 @@ fun MovementCancellingCard(
     onInfoClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
+    BaseCard(
         modifier = modifier
-            .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .alpha(if (isConnected && !isUiLocked) 1f else 0.5f)
-            .clickable(enabled = isConnected && !isUiLocked) { onCardClick() },
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
-        ),
-        shape = RoundedCornerShape(24.dp)
+            .alpha(if (isConnected && !isUiLocked) 1f else 0.5f),
+        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
+        onClick = { onCardClick() },
+        enabled = isConnected && !isUiLocked
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),

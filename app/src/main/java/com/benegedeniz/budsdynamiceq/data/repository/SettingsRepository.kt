@@ -30,7 +30,26 @@ class SettingsRepository(context: Context) {
             .remove("detected_model_$mac")
             .remove("model_override_$mac")
             .remove("experimental_gestures_enabled_$mac")
+            .remove(customEqKey(mac, 1))
+            .remove(customEqKey(mac, 2))
+            .remove(customEqKey(mac, 3))
             .apply()
+    }
+
+    fun getCustomEqBands(mac: String?, slotIndex: Int): List<Int> {
+        val raw = prefs.getString(customEqKey(mac, slotIndex), null)
+            ?: mac?.let { prefs.getString(customEqKey(null, slotIndex), null) }
+        return com.benegedeniz.budsdynamiceq.data.model.CustomEqualizer.parseStored(raw)
+    }
+
+    fun saveCustomEqBands(mac: String?, bands: List<Int>, slotIndex: Int) {
+        prefs.edit()
+            .putString(customEqKey(mac, slotIndex), com.benegedeniz.budsdynamiceq.data.model.CustomEqualizer.serialize(bands))
+            .apply()
+    }
+
+    private fun customEqKey(mac: String?, slotIndex: Int): String {
+        return if (mac.isNullOrBlank()) "custom_eq_bands_${slotIndex}" else "custom_eq_bands_${slotIndex}_$mac"
     }
 
     fun getDetectedModel(mac: String): BudsModel {

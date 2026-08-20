@@ -80,8 +80,22 @@ class MediaObserver(private val context: Context) {
     private val genreCache = context.getSharedPreferences("genre_cache", Context.MODE_PRIVATE)
     private val failedGenreFetches = mutableSetOf<String>()
 
+    private val prefs = context.getSharedPreferences("BudsPrefs", Context.MODE_PRIVATE)
+
     private val activeSessionsListener = MediaSessionManager.OnActiveSessionsChangedListener { controllers ->
         updateActiveControllers(controllers)
+    }
+
+    private val prefsListener = android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+        if (key == "ignored_media_players") {
+            try {
+                val componentName = ComponentName(context, MediaListenerService::class.java)
+                val controllers = mediaSessionManager.getActiveSessions(componentName)
+                updateActiveControllers(controllers)
+            } catch (e: SecurityException) {
+                Log.e(TAG, "Missing permission to fetch sessions on pref change", e)
+            }
+        }
     }
 
     private val controllerCallbacks = mutableMapOf<MediaController, MediaController.Callback>()
@@ -97,6 +111,7 @@ class MediaObserver(private val context: Context) {
                 android.service.notification.NotificationListenerService.requestRebind(componentName)
             }
             mediaSessionManager.addOnActiveSessionsChangedListener(activeSessionsListener, componentName)
+            prefs.registerOnSharedPreferenceChangeListener(prefsListener)
             val controllers = mediaSessionManager.getActiveSessions(componentName)
             updateActiveControllers(controllers)
         } catch (e: SecurityException) {
@@ -107,6 +122,7 @@ class MediaObserver(private val context: Context) {
     fun stopObserving() {
         try {
             mediaSessionManager.removeOnActiveSessionsChangedListener(activeSessionsListener)
+            prefs.unregisterOnSharedPreferenceChangeListener(prefsListener)
         } catch (e: Exception) {
             Log.e(TAG, "Error stopping observation", e)
         }
@@ -137,10 +153,21 @@ class MediaObserver(private val context: Context) {
         for (controller in currentControllers) {
             if (!controllerCallbacks.containsKey(controller)) {
                 val callback = object : MediaController.Callback() {
+                    private fun isControllerActive(): Boolean {
+                        val prefs = context.getSharedPreferences("BudsPrefs", Context.MODE_PRIVATE)
+                        val ignoredPlayers = prefs.getStringSet("ignored_media_players", emptySet()) ?: emptySet()
+                        
+                        var activeControllers = mediaSessionManager.getActiveSessions(ComponentName(context, MediaListenerService::class.java))
+                            .filter { it.playbackInfo?.playbackType == android.media.session.MediaController.PlaybackInfo.PLAYBACK_TYPE_LOCAL }
+                            .filter { !ignoredPlayers.contains(it.packageName) }
+                            
+                        val primary = activeControllers.firstOrNull { it.playbackState?.state == android.media.session.PlaybackState.STATE_PLAYING } ?: activeControllers.firstOrNull()
+                        return primary?.sessionToken == controller.sessionToken
+                    }
+
                     override fun onMetadataChanged(metadata: MediaMetadata?) {
                         super.onMetadataChanged(metadata)
-                        // If this controller is currently playing, or it's the only one, update title
-                        if (controller.playbackState?.state == android.media.session.PlaybackState.STATE_PLAYING || currentControllers.size == 1) {
+                        if (isControllerActive()) {
                             updateTitleFromMetadata(metadata)
                         }
                     }
@@ -160,7 +187,9 @@ class MediaObserver(private val context: Context) {
                             } else {
                                 currentIntent = PlaybackIntent.MANUAL_PLAY
                             }
-                            updateTitleFromMetadata(controller.metadata)
+                            if (isControllerActive()) {
+                                updateTitleFromMetadata(controller.metadata)
+                            }
                         } else if (currentState == android.media.session.PlaybackState.STATE_PAUSED || currentState == android.media.session.PlaybackState.STATE_STOPPED) {
                             if (pendingAutomationPause) {
                                 currentIntent = PlaybackIntent.AUTOMATION_PAUSE
@@ -176,10 +205,17 @@ class MediaObserver(private val context: Context) {
             }
         }
 
+        val prefs = context.getSharedPreferences("BudsPrefs", Context.MODE_PRIVATE)
+        val ignoredPlayers = prefs.getStringSet("ignored_media_players", emptySet()) ?: emptySet()
+
         // Initially find the playing controller, or fallback to first
-        val playingController = currentControllers.firstOrNull { 
+        var localControllers = currentControllers
+            .filter { it.playbackInfo?.playbackType == android.media.session.MediaController.PlaybackInfo.PLAYBACK_TYPE_LOCAL }
+            .filter { !ignoredPlayers.contains(it.packageName) }
+            
+        val playingController = localControllers.firstOrNull { 
             it.playbackState?.state == android.media.session.PlaybackState.STATE_PLAYING 
-        } ?: currentControllers.firstOrNull()
+        } ?: localControllers.firstOrNull()
         
         updateTitleFromMetadata(playingController?.metadata)
     }
@@ -203,7 +239,14 @@ class MediaObserver(private val context: Context) {
         handleNewMetadata(title, artist, genre)
     }
 
-    fun updateTitleFromNotification(title: String?, artist: String?) {
+    fun updateTitleFromNotification(title: String?, artist: String?, packageName: String?) {
+        if (packageName != null) {
+            val prefs = context.getSharedPreferences("BudsPrefs", Context.MODE_PRIVATE)
+            val ignoredPlayers = prefs.getStringSet("ignored_media_players", emptySet()) ?: emptySet()
+            if (ignoredPlayers.contains(packageName)) {
+                return
+            }
+        }
         handleNewMetadata(title, artist, null)
     }
 
