@@ -113,21 +113,8 @@ fun AppSettingsScreen(
         Triple("ru", "🇷🇺", "Русский")
     )
 
-
-    val isFromPlayStore = remember(context) {
-        try {
-            val installer = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                context.packageManager.getInstallSourceInfo(context.packageName).installingPackageName
-            } else {
-                @Suppress("DEPRECATION")
-                context.packageManager.getInstallerPackageName(context.packageName)
-            }
-            installer == "com.android.vending"
-        } catch (e: Exception) {
-            false
-        }
-    }
     
+
     val versionCode = remember(context) {
         try {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
@@ -144,8 +131,8 @@ fun AppSettingsScreen(
     var changelogText by remember { mutableStateOf<String?>(null) }
     var isChangelogExpanded by remember { mutableStateOf(false) }
 
-    LaunchedEffect(isFromPlayStore, versionCode) {
-        if (!isFromPlayStore) {
+    LaunchedEffect(versionCode) {
+        if (true) {
             kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
                 try {
                     val lang = java.util.Locale.getDefault().language
@@ -842,7 +829,7 @@ fun AppSettingsScreen(
                          }
                     }
 
-                    if (!isFromPlayStore) {
+                    if (true) {
                         HorizontalDivider(
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.15f)
                         )
@@ -945,7 +932,7 @@ fun AppSettingsScreen(
                         }
                     }
                     
-                    if (!isFromPlayStore && !changelogText.isNullOrEmpty()) {
+                    if (!changelogText.isNullOrEmpty()) {
                         HorizontalDivider(
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.15f)
                         )
