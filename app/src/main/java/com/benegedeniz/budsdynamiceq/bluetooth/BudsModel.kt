@@ -105,7 +105,7 @@ enum class BudsModel(
         supportsHeadGestures = false,
         isExperimentalGestures = false,
         supportsFmgRingWhileWearing = true,
-        supportsDoubleTapEdge = true,
+        supportsDoubleTapEdge = false,
         supportsCustomEqualizer = false
     ),
     UNKNOWN(
