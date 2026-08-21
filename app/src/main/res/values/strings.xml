@@ -349,9 +349,12 @@
 	<string name="model_buds_3_pro">Galaxy Buds3 Pro</string>
 	<string name="model_buds_4">Galaxy Buds4</string>
 	<string name="model_buds_4_pro">Galaxy Buds4 Pro</string>
+	<string name="model_buds_3_fe">Galaxy Buds3 FE</string>
+	<string name="model_buds_fe">Galaxy Buds FE</string>
 	<string name="model_buds_unknown">Galaxy Buds (Unknown)</string>
 	<string name="setup_gestures_supported">Gestures supported</string>
-	<string name="setup_gestures_not_supported">Gesture support is experimental</string>
+	<string name="setup_gestures_not_supported">Gestures not supported</string>
+	<string name="setup_gestures_experimental">Gestures are experimental</string>
 	<string name="btn_next">Next</string>
 	<string name="btn_get_started">Get Started</string>
 	<string name="btn_got_it">Got it</string>
@@ -539,4 +542,6 @@
     <string name="clear_genre_cache_desc">Clear locally cached genres and failed fetch history.</string>
     <string name="cache_cleared">Cache cleared successfully.</string>
     <string name="rule_applied_toast">Applied: %1$s</string>
+    <string name="not_affiliated_samsung">Not affiliated with Samsung Electronics Co., Ltd.</string>
+    <string name="open_source_by_benegedeniz">Bud Buddy is an open-source project by BenEgeDeniz</string>
 </resources>

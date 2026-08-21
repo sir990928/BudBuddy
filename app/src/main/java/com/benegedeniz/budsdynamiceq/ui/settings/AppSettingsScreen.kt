@@ -56,6 +56,7 @@ import com.benegedeniz.budsdynamiceq.util.UpdateChecker
 @Composable
 fun AppSettingsScreen(
     onBack: () -> Unit,
+    onAboutClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     androidx.activity.compose.BackHandler { onBack() }
@@ -84,7 +85,6 @@ fun AppSettingsScreen(
     var isGeneralExpanded by remember { mutableStateOf(false) }
     var isMusicRulesExpanded by remember { mutableStateOf(false) }
     var isSystemIntExpanded by remember { mutableStateOf(false) }
-    var isAboutExpanded by remember { mutableStateOf(false) }
 
     var themePreference by remember { mutableStateOf(prefs.getInt("theme_preference", 0)) }
     var enableHaptics by remember { mutableStateOf(prefs.getBoolean("enable_haptics", true)) }
@@ -113,21 +113,8 @@ fun AppSettingsScreen(
         Triple("ru", "🇷🇺", "Русский")
     )
 
-
-    val isFromPlayStore = remember(context) {
-        try {
-            val installer = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                context.packageManager.getInstallSourceInfo(context.packageName).installingPackageName
-            } else {
-                @Suppress("DEPRECATION")
-                context.packageManager.getInstallerPackageName(context.packageName)
-            }
-            installer == "com.android.vending"
-        } catch (e: Exception) {
-            false
-        }
-    }
     
+
     val versionCode = remember(context) {
         try {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
@@ -144,8 +131,8 @@ fun AppSettingsScreen(
     var changelogText by remember { mutableStateOf<String?>(null) }
     var isChangelogExpanded by remember { mutableStateOf(false) }
 
-    LaunchedEffect(isFromPlayStore, versionCode) {
-        if (!isFromPlayStore) {
+    LaunchedEffect(versionCode) {
+        if (true) {
             kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
                 try {
                     val lang = java.util.Locale.getDefault().language
@@ -756,9 +743,7 @@ fun AppSettingsScreen(
                 }
             }
 
-
-
-            // About App Accordion Card (Collapsed by Default)
+            // About App Card
             Card(
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(
@@ -766,159 +751,36 @@ fun AppSettingsScreen(
                 ),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Column(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onAboutClick()
+                        }
+                        .padding(20.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                isAboutExpanded = !isAboutExpanded
-                            }
-                            .padding(20.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Info,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(24.dp)
-                            )
-                            Text(
-                                text = stringResource(R.string.about_bud_buddy),
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-
                         Icon(
-                            imageVector = if (isAboutExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                            imageVector = Icons.Default.Info,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
                         )
-                    }
-
-                    AnimatedVisibility(
-                        visible = isAboutExpanded,
-                        enter = fadeIn() + expandVertically(),
-                        exit = fadeOut() + shrinkVertically()
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 20.dp)
-                                .padding(bottom = 20.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            HorizontalDivider(
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.15f)
-                            )
-
-                            Text(
-                                text = stringResource(R.string.bud_buddy_is_your_central_hub_for_managi),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .clickable {
-                                            uriHandler.openUri("https://benegedeniz.com")
-                                        }
-                                        .padding(vertical = 4.dp)
-                                ) {
-                                    Text(
-                                        text = stringResource(R.string.https_benegedeniz_com),
-                                        style = MaterialTheme.typography.bodyMedium.copy(textDecoration = TextDecoration.Underline),
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Filled.OpenInNew,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                }
-                                
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .clickable {
-                                            uriHandler.openUri("https://github.com/BenEgeDeniz/BudBuddy")
-                                        }
-                                        .padding(vertical = 4.dp)
-                                ) {
-                                    Text(
-                                        text = "Source Code (GitHub)",
-                                        style = MaterialTheme.typography.bodyMedium.copy(textDecoration = TextDecoration.Underline),
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Filled.OpenInNew,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                }
-
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .clickable {
-                                        uriHandler.openUri("mailto:ege@benegedeniz.com")
-                                    }
-                                    .padding(vertical = 4.dp)
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.ege_benegedeniz_com),
-                                    style = MaterialTheme.typography.bodyMedium.copy(textDecoration = TextDecoration.Underline),
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.OpenInNew,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.height(4.dp))
-                            HorizontalDivider(
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.15f)
-                            )
-
-                            Text(
-                                text = stringResource(R.string.open_source_licenses),
-                                style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Text(
-                                text = stringResource(R.string.github_com_timschneeb_galaxybudsclient_n),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
+                        Text(
+                            text = stringResource(R.string.about_bud_buddy),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                     }
                 }
             }
-
-            // Version & Update Control Card
             Card(
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(
@@ -967,7 +829,7 @@ fun AppSettingsScreen(
                          }
                     }
 
-                    if (!isFromPlayStore) {
+                    if (true) {
                         HorizontalDivider(
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.15f)
                         )
@@ -1070,7 +932,7 @@ fun AppSettingsScreen(
                         }
                     }
                     
-                    if (!isFromPlayStore && !changelogText.isNullOrEmpty()) {
+                    if (!changelogText.isNullOrEmpty()) {
                         HorizontalDivider(
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.15f)
                         )

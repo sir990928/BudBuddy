@@ -1,0 +1,3 @@
+✨ v1.7.0
+- Added support for Galaxy Buds3 FE and Galaxy Buds FE.
+- Various bug fixes and improvements

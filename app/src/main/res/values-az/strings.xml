@@ -348,9 +348,12 @@
 	<string name="model_buds_3_pro">Galaxy Buds3 Pro</string>
 	<string name="model_buds_4">Galaxy Buds4</string>
 	<string name="model_buds_4_pro">Galaxy Buds4 Pro</string>
+	<string name="model_buds_3_fe">Galaxy Buds3 FE</string>
+	<string name="model_buds_fe">Galaxy Buds FE</string>
 	<string name="model_buds_unknown">Galaxy Buds (Naməlum)</string>
 	<string name="setup_gestures_supported">Jestlər dəstəklənir</string>
-	<string name="setup_gestures_not_supported">Jest dəstəyi eksperimentaldır</string>
+	<string name="setup_gestures_not_supported">Jestlər dəstəklənmir</string>
+	<string name="setup_gestures_experimental">Jest dəstəyi eksperimentaldır</string>
 	<string name="btn_next">İrəli</string>
 	<string name="btn_get_started">Başlayın</string>
 	<string name="btn_got_it">Başa düşdüm</string>
@@ -536,7 +539,9 @@
     <string name="auto_connect_buds">Qulaqlıqlara Avtomatik Qoşul</string>
     <string name="auto_connect_buds_desc">Yadda saxlanılmış Galaxy Buds cihazı qoşulduqda xidməti başlat.</string>
     <string name="clear_genre_cache">Janr Keşini Təmizlə</string>
-    <string name="clear_genre_cache_desc">Yerli keşi təmizləyərək janrların yenidən yüklənməsini məcbur et.</string>
+    <string name="clear_genre_cache_desc">Lokal olaraq keşlənmiş janrları və uğursuz cəhdlər tarixçəsini təmizləyin.</string>
     <string name="cache_cleared">Keş uğurla təmizləndi.</string>
     <string name="rule_applied_toast">Tətbiq edildi: %1$s</string>
+    <string name="not_affiliated_samsung">Samsung Electronics Co., Ltd. ilə heç bir əlaqəsi yoxdur.</string>
+    <string name="open_source_by_benegedeniz">Bud Buddy, BenEgeDeniz tərəfindən hazırlanmış açıq mənbəli layihədir.</string>
 </resources>

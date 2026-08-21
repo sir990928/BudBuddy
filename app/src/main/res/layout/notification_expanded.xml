@@ -8,30 +8,30 @@
     <!-- Title and Subtitle -->
     <TextView
         android:id="@+id/notification_title"
-        style="@style/TextAppearance.Compat.Notification.Title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="BudsService"
+        android:textColor="@color/notification_primary_text"
         android:textSize="16sp"
         android:textStyle="bold" />
 
     <TextView
         android:id="@+id/notification_rule_state"
-        style="@style/TextAppearance.Compat.Notification.Line2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
+        android:textColor="@color/notification_primary_text"
         android:text="Settings: None"
         android:textSize="14sp" />
 
     <!-- Hardware Real-time State -->
     <TextView
         android:id="@+id/notification_hardware_state"
-        style="@style/TextAppearance.Compat.Notification.Line2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
         android:text="Active NC: Transparent"
+        android:textColor="@color/notification_primary_text"
         android:textStyle="italic"
         android:textSize="14sp" />
 
@@ -142,7 +142,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:text="Toggle ANC / Ambient"
-        style="?android:attr/borderlessButtonStyle"
+        android:background="@android:color/transparent"
         android:textColor="@color/notification_primary_text"
         android:textStyle="bold" />
 
