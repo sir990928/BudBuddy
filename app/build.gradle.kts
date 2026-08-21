@@ -12,10 +12,20 @@ android {
         applicationId = "com.benegedeniz.budsdynamiceq"
         minSdk = 31
         targetSdk = 37
-        versionCode = 9
-        versionName = "1.6.0"
+        versionCode = 10
+        versionName = "1.7.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    flavorDimensions += "distribution"
+    productFlavors {
+        create("playstore") {
+            dimension = "distribution"
+        }
+        create("github") {
+            dimension = "distribution"
+        }
     }
 
     buildTypes {

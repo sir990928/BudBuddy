@@ -279,8 +279,10 @@ class BudsController(
                 name.contains("Buds4 Pro", ignoreCase = true) -> BudsModel.BUDS_4_PRO
                 name.contains("Buds4", ignoreCase = true) -> BudsModel.BUDS_4
                 name.contains("Buds3 Pro", ignoreCase = true) -> BudsModel.BUDS_3_PRO
+                name.contains("Buds3 FE", ignoreCase = true) -> BudsModel.BUDS_3_FE
                 name.contains("Buds3", ignoreCase = true) -> BudsModel.BUDS_3
                 name.contains("Buds2 Pro", ignoreCase = true) -> BudsModel.BUDS_2_PRO
+                name.contains("Buds FE", ignoreCase = true) -> BudsModel.BUDS_FE
                 name.contains("Buds2", ignoreCase = true) -> BudsModel.BUDS_2
                 else -> BudsModel.UNKNOWN
             }

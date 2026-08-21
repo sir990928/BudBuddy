@@ -2,10 +2,16 @@ Bud Buddy, Samsung Galaxy Buds Manager üçün təkmilləşdirilmiş açıq mən
 
 Dəstəklənən Qulaqlıqlar:
 - Galaxy Buds 4 Pro (Baş Jestləri daxil olmaqla tam dəstək)
-- Galaxy Buds 3 Pro (Dəstəklənir, lakin Baş Jestləri mövcud deyil)
-- Galaxy Buds 3 (Dəstəklənir, lakin Baş Jestləri mövcud deyil)
-- Galaxy Buds 2 Pro (Baş Jestləri daxil olmaqla tam dəstək)
-- Galaxy Buds 2 (Baş Jestləri daxil olmaqla tam dəstək)
+- Galaxy Buds 4 (Baş Jestləri daxil olmaqla tam dəstək)
+- Galaxy Buds 3 Pro (Dəstəklənir, lakin Baş Jestləri eksperimentaldır)
+- Galaxy Buds 3 (Dəstəklənir, lakin Baş Jestləri eksperimentaldır)
+- Galaxy Buds 3 FE (Dəstəklənir, lakin Baş Jestləri mövcud deyil)
+- Galaxy Buds 2 Pro (Dəstəklənir, lakin Baş Jestləri eksperimentaldır)
+- Galaxy Buds 2 (Dəstəklənir, lakin Baş Jestləri eksperimentaldır)
+- Galaxy Buds FE (Dəstəklənir, lakin Baş Jestləri mövcud deyil)
 
 Təşəkkürlər:
 Qulaqlıqların Bluetooth baytları vasitəsilə idarə edilməsi yanaşması GalaxyBudsClient layihəsində (https://github.com/timschneeb/GalaxyBudsClient) görülən fantastik işlərdən öyrənilmişdir.
+
+Bud Buddy, BenEgeDeniz tərəfindən hazırlanmış açıq mənbəli layihədir.
+Samsung Electronics Co., Ltd. ilə heç bir əlaqəsi yoxdur.

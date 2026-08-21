@@ -9,6 +9,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bluetooth
@@ -56,6 +58,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import com.benegedeniz.budsdynamiceq.ui.components.SearchBarInput
 import com.benegedeniz.budsdynamiceq.ui.components.PageHeader
 import com.benegedeniz.budsdynamiceq.ui.components.rememberPageHeaderOverlayPadding
+import com.benegedeniz.budsdynamiceq.ui.components.verticalScrollbar
 import com.benegedeniz.budsdynamiceq.ui.components.bounceClick
 import com.benegedeniz.budsdynamiceq.ui.buds.components.*
 import com.benegedeniz.budsdynamiceq.ui.rules.RulesViewModel
@@ -879,7 +882,13 @@ fun BudsScreen(
                 Text(stringResource(R.string.device_model), style = MaterialTheme.typography.titleLarge)
             },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                val scrollState = rememberScrollState()
+                Column(
+                    modifier = Modifier
+                        .verticalScroll(scrollState)
+                        .verticalScrollbar(scrollState),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
                     if (connectedModel != com.benegedeniz.budsdynamiceq.bluetooth.BudsModel.UNKNOWN) {
                         Text(
                             text = stringResource(R.string.buds_auto_detected, stringResource(connectedModel.displayNameRes)),
@@ -942,8 +951,10 @@ fun BudsScreen(
                         com.benegedeniz.budsdynamiceq.bluetooth.BudsModel.BUDS_4,
                         com.benegedeniz.budsdynamiceq.bluetooth.BudsModel.BUDS_3_PRO,
                         com.benegedeniz.budsdynamiceq.bluetooth.BudsModel.BUDS_3,
+                        com.benegedeniz.budsdynamiceq.bluetooth.BudsModel.BUDS_3_FE,
                         com.benegedeniz.budsdynamiceq.bluetooth.BudsModel.BUDS_2_PRO,
-                        com.benegedeniz.budsdynamiceq.bluetooth.BudsModel.BUDS_2
+                        com.benegedeniz.budsdynamiceq.bluetooth.BudsModel.BUDS_2,
+                        com.benegedeniz.budsdynamiceq.bluetooth.BudsModel.BUDS_FE
                     )
                     models.forEach { model ->
                         Row(
