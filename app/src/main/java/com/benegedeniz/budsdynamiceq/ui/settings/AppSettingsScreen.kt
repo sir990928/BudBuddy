@@ -135,10 +135,16 @@ fun AppSettingsScreen(
         if (true) {
             kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
                 try {
-                    val lang = java.util.Locale.getDefault().language
+                    val lang = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                        context.resources.configuration.locales.get(0).language
+                    } else {
+                        @Suppress("DEPRECATION")
+                        context.resources.configuration.locale.language
+                    }
                     val folderName = when (lang) {
                         "tr" -> "tr-TR"
                         "az" -> "az-AZ"
+                        "ru" -> "ru-RU"
                         else -> "en-US"
                     }
                     var url = java.net.URL("https://raw.githubusercontent.com/BenEgeDeniz/BudBuddy/refs/heads/master/fastlane/metadata/android/$folderName/changelogs/$versionCode.txt")

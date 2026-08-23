@@ -16,6 +16,13 @@ android {
         versionName = "1.7.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        resourceConfigurations += listOf("en", "tr", "az", "ru")
+    }
+
+    bundle {
+        language {
+            enableSplit = false
+        }
     }
 
     flavorDimensions += "distribution"
