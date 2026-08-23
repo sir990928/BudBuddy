@@ -38,12 +38,17 @@ This project uses standard Android build tools. To build it locally:
 
 ## Download & Installation
 
-You can download the latest stable version of Bud Buddy from our [GitHub Releases](https://github.com/BenEgeDeniz/BudBuddy/releases) page.
+### 🧪 Google Play Closed Beta
+Bud Buddy is now live in **Closed Testing** on Google Play! To join the beta test team:
+1. Join the [Bud Buddy Tester Google Group](https://groups.google.com/g/budbuddy-closed).
+2. Opt-in to testing via the [Google Play Web Opt-in Link](https://play.google.com/apps/testing/com.benegedeniz.budsdynamiceq).
+3. Download or update the app directly from the [Google Play Store](https://play.google.com/store/apps/details?id=com.benegedeniz.budsdynamiceq).
 
-If you are feeling adventurous and want to try out the newest unreleased features, you can download the [staging testing builds](https://github.com/BenEgeDeniz/BudBuddy/actions?query=branch%3Astaging) from the Actions tab. These builds are vetted release candidates and are generally safe to use.
-
-If you *really* want to live on the bleeding edge, [development builds](https://github.com/BenEgeDeniz/BudBuddy/actions?query=branch%3Adev) are also available.
-**Be warned:** these builds can be incredibly unstable and potentially insecure, as anyone can trigger a debug APK build by creating a pull request! Download at your own risk.
+### 📦 GitHub Releases & Builds
+You can also download standalone APKs directly:
+- **Stable Releases:** Download from our [GitHub Releases](https://github.com/BenEgeDeniz/BudBuddy/releases) page.
+- **Staging Builds (Unreleased candidate features):** Download from [Staging Actions Builds](https://github.com/BenEgeDeniz/BudBuddy/actions?query=branch%3Astaging).
+- **Bleeding-edge Development Builds:** Download from [Dev Actions Builds](https://github.com/BenEgeDeniz/BudBuddy/actions?query=branch%3Adev). *(Note: dev builds may be unstable).*
 
 ## Contributing
 
