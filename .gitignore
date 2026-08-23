@@ -19,7 +19,14 @@ local.properties
 
 # Ignore compiled app build outputs
 /app/release/
+/app/playstore/
+/app/github/
 /app/build/
+
+# Keystores and secrets
+*.jks
+*.keystore
+keystore.properties
 
 /GalaxyBudsClient
 plan.md
