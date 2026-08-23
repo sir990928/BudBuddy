@@ -1,0 +1,4 @@
+✨ v1.7.1
+- Play Store sürümünde Rusça dil seçeneğinin İngilizceye düşme sorunu düzeltildi.
+- Play Store uyumluluğu için ürün çeşidi (flavor) optimizasyonları yapıldı.
+- Hata düzeltmeleri ve kararlılık iyileştirmeleri.

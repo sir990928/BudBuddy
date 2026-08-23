@@ -1,0 +1,4 @@
+✨ v1.7.1
+- Play Store versiyasında Rus dili fallback xətası düzəldildi.
+- Play Store uyğunluğu üçün məhsul çeşidi optimizasiyaları edildi.
+- Xəta düzəlişləri və sabitlik təkmilləşdirmələri.

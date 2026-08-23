@@ -1,0 +1,4 @@
+✨ v1.7.1
+- Fixed Russian language fallback issue on Play Store builds.
+- Product flavor optimizations for Play Store compliance.
+- Bug fixes and stability improvements.
