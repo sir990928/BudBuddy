@@ -56,10 +56,10 @@ jobs:
           fi
           echo "Chinese locale resource verified."
 
-      - name: Set up JDK 21
+      - name: Set up JDK 17
         uses: actions/setup-java@v5
         with:
-          java-version: '21'
+          java-version: '17'
           distribution: 'temurin'
           cache: gradle
 
