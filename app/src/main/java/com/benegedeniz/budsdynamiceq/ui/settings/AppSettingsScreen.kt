@@ -110,7 +110,8 @@ fun AppSettingsScreen(
         Triple("en", "🇺🇸", "English"),
         Triple("tr", "🇹🇷", "Türkçe"),
         Triple("az", "🇦🇿", "Azərbaycanca"),
-        Triple("ru", "🇷🇺", "Русский")
+        Triple("ru", "🇷🇺", "Русский"),
+        Triple("zh-rCN", "🇨🇳", "中文")
     )
 
     
