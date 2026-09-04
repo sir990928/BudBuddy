@@ -77,32 +77,20 @@ jobs:
           name: app-debug-dev
           path: app/build/outputs/apk/github/debug/app-github-debug.apk
 
-      - name: Decode Staging Keystore (Staging)
+      - name: Build Debug APK (Staging)
         if: github.ref == 'refs/heads/staging' || github.base_ref == 'staging'
-        env:
-          STAGING_KEYSTORE_BASE64: ${{ secrets.STAGING_KEYSTORE_BASE64 }}
-        run: |
-          echo "$STAGING_KEYSTORE_BASE64" | base64 --decode > "${{ github.workspace }}/staging-keystore.jks"
+        run: ./gradlew assembleGithubDebug
 
-      - name: Build Debug & Signed Release APKs (Staging)
-        if: github.ref == 'refs/heads/staging' || github.base_ref == 'staging'
-        env:
-          STAGING_KEY_ALIAS: ${{ secrets.STAGING_KEY_ALIAS }}
-          STAGING_KEY_PASSWORD: ${{ secrets.STAGING_KEY_PASSWORD }}
-          STAGING_STORE_PASSWORD: ${{ secrets.STAGING_STORE_PASSWORD }}
-        run: |
-          ./gradlew assembleGithubDebug assembleGithubRelease \
-            -Pandroid.injected.signing.store.file="${{ github.workspace }}/staging-keystore.jks" \
-            -Pandroid.injected.signing.store.password="$STAGING_STORE_PASSWORD" \
-            -Pandroid.injected.signing.key.alias="$STAGING_KEY_ALIAS" \
-            -Pandroid.injected.signing.key.password="$STAGING_KEY_PASSWORD"
-
-      - name: Upload Debug APK
+      - name: Upload Debug APK (Staging)
         if: github.ref == 'refs/heads/staging' || github.base_ref == 'staging'
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
           path: app/build/outputs/apk/github/debug/app-github-debug.apk
+
+      - name: Build Unsigned Release APK (Staging)
+        if: github.ref == 'refs/heads/staging' || github.base_ref == 'staging'
+        run: ./gradlew assembleGithubRelease
 
       - name: Upload Staging Release APK
         if: github.ref == 'refs/heads/staging' || github.base_ref == 'staging'
@@ -111,7 +99,7 @@ jobs:
           name: app-staging-release
           path: app/build/outputs/apk/github/release/app-github-release*.apk
 
-      - name: Decode Keystore (Master)
+      - name: Build Unsigned Release APK (Master)
         if: >
           github.ref == 'refs/heads/master' ||
           (
@@ -120,30 +108,7 @@ jobs:
             github.head_ref == 'staging' &&
             github.event.pull_request.head.repo.full_name == github.repository
           )
-        env:
-          SIGNING_KEYSTORE_BASE64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
-        run: |
-          echo "$SIGNING_KEYSTORE_BASE64" | base64 --decode > "${{ github.workspace }}/keystore.jks"
-
-      - name: Build Release APK (Master)
-        if: >
-          github.ref == 'refs/heads/master' ||
-          (
-            github.event_name == 'pull_request' &&
-            github.base_ref == 'master' &&
-            github.head_ref == 'staging' &&
-            github.event.pull_request.head.repo.full_name == github.repository
-          )
-        env:
-          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
-          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
-          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
-        run: |
-          ./gradlew assembleGithubRelease \
-            -Pandroid.injected.signing.store.file="${{ github.workspace }}/keystore.jks" \
-            -Pandroid.injected.signing.store.password="$SIGNING_STORE_PASSWORD" \
-            -Pandroid.injected.signing.key.alias="$SIGNING_KEY_ALIAS" \
-            -Pandroid.injected.signing.key.password="$SIGNING_KEY_PASSWORD"
+        run: ./gradlew assembleGithubRelease
 
       - name: Upload Release APK
         if: >
@@ -157,4 +122,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-release
-          path: app/build/outputs/apk/github/release/app-github-release.apk
+          path: app/build/outputs/apk/github/release/app-github-release*.apk
