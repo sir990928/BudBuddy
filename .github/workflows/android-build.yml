@@ -22,7 +22,6 @@ jobs:
 
             if [[ "${{ github.head_ref }}" != "dev" ]]; then
               echo "::error::Pull requests to 'staging' MUST originate from the 'dev' branch."
-              echo "::error::You are trying to merge from '${{ github.head_ref }}'."
               exit 1
             fi
           fi
@@ -35,7 +34,6 @@ jobs:
 
             if [[ "${{ github.head_ref }}" != "staging" ]]; then
               echo "::error::Pull requests to 'master' MUST originate from the 'staging' branch."
-              echo "::error::You are trying to merge from '${{ github.head_ref }}'."
               exit 1
             fi
           fi
@@ -49,6 +47,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+
+      - name: Verify Chinese locale resources
+        run: |
+          if [[ ! -f "app/src/main/res/values-zh-rCN/strings.xml" ]]; then
+            echo "::error::Chinese locale file not found at app/src/main/res/values-zh-rCN/strings.xml"
+            exit 1
+          fi
+          echo "Chinese locale resource verified."
 
       - name: Set up JDK 21
         uses: actions/setup-java@v5
