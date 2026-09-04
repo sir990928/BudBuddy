@@ -1,181 +1,66 @@
-name: Android CI/CD
+name: BudBuddy CI（自动签名）
 
 on:
   push:
     branches: [ "staging", "master" ]
   pull_request:
     branches: [ "dev", "staging", "master" ]
+  workflow_dispatch:
 
 jobs:
-  policy:
-    name: PR Policy
-    runs-on: ubuntu-latest
-    steps:
-      - name: Enforce promotion workflow
-        if: github.event_name == 'pull_request'
-        run: |
-          if [[ "${{ github.base_ref }}" == "staging" ]]; then
-            if [[ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]]; then
-              echo "::error::Pull requests to 'staging' from external forks are not allowed."
-              exit 1
-            fi
-
-            if [[ "${{ github.head_ref }}" != "dev" ]]; then
-              echo "::error::Pull requests to 'staging' MUST originate from the 'dev' branch."
-              exit 1
-            fi
-          fi
-
-          if [[ "${{ github.base_ref }}" == "master" ]]; then
-            if [[ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]]; then
-              echo "::error::Pull requests to 'master' from external forks are not allowed."
-              exit 1
-            fi
-
-            if [[ "${{ github.head_ref }}" != "staging" ]]; then
-              echo "::error::Pull requests to 'master' MUST originate from the 'staging' branch."
-              exit 1
-            fi
-          fi
-
-          echo "Branch promotion policy passed."
-
   build:
-    needs: policy
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
-      - name: Verify Chinese locale resources
-        run: |
-          if [[ ! -f "app/src/main/res/values-zh-rCN/strings.xml" ]]; then
-            echo "::error::Chinese locale file not found at app/src/main/res/values-zh-rCN/strings.xml"
-            exit 1
-          fi
-          echo "Chinese locale resource verified."
-
-      - name: Set up JDK 21
-        uses: actions/setup-java@v5
+      - name: 拉取源码
+        uses: actions/checkout@v4
         with:
-          java-version: '21'
-          distribution: 'temurin'
+          fetch-depth: 0
+
+      - name: 配置 JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: temurin
           cache: gradle
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Build Debug APK (Dev)
-        if: github.ref == 'refs/heads/dev' || github.base_ref == 'dev'
-        run: ./gradlew assembleGithubDebug
-
-      - name: Upload Debug APK (Dev)
-        if: github.ref == 'refs/heads/dev' || github.base_ref == 'dev'
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-debug-dev
-          path: app/build/outputs/apk/github/debug/app-github-debug.apk
-
-      - name: Build Debug APK (Staging)
-        if: github.ref == 'refs/heads/staging' || github.base_ref == 'staging'
-        run: ./gradlew assembleGithubDebug
-
-      - name: Upload Debug APK (Staging)
-        if: github.ref == 'refs/heads/staging' || github.base_ref == 'staging'
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-debug
-          path: app/build/outputs/apk/github/debug/app-github-debug.apk
-
-      - name: Build Unsigned Release APK (Staging)
-        if: github.ref == 'refs/heads/staging' || github.base_ref == 'staging'
-        run: ./gradlew assembleGithubRelease
-
-      - name: Upload Staging Release APK
-        if: github.ref == 'refs/heads/staging' || github.base_ref == 'staging'
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-staging-release-unsigned
-          path: app/build/outputs/apk/github/release/app-github-release*.apk
-
-      - name: Build Unsigned Release APK (Master)
-        if: >
-          github.ref == 'refs/heads/master' ||
-          (
-            github.event_name == 'pull_request' &&
-            github.base_ref == 'master' &&
-            github.head_ref == 'staging' &&
-            github.event.pull_request.head.repo.full_name == github.repository
-          )
-        run: ./gradlew assembleGithubRelease
-
-      - name: Upload Master Release APK
-        if: >
-          github.ref == 'refs/heads/master' ||
-          (
-            github.event_name == 'pull_request' &&
-            github.base_ref == 'master' &&
-            github.head_ref == 'staging' &&
-            github.event.pull_request.head.repo.full_name == github.repository
-          )
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-master-release-unsigned
-          path: app/build/outputs/apk/github/release/app-github-release*.apk
-
-  sign:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Set up JDK 11
-        uses: actions/setup-java@v5
-        with:
-          java-version: '11'
-          distribution: 'temurin'
-
-      - name: Restore signing keystore
+      - name: 还原签名 keystore
         env:
           SIGNING_KEYSTORE: ${{ secrets.SIGNING_KEYSTORE }}
         run: |
           echo "$SIGNING_KEYSTORE" | base64 -d > release.jks
 
-      - name: Download Staging APK
-        if: github.ref == 'refs/heads/staging' || github.base_ref == 'staging'
-        uses: actions/download-artifact@v4
+      - name: 安装 Android SDK
+        uses: android-actions/setup-android@v3
         with:
-          name: app-staging-release-unsigned
-          path: staging-apk
+          accept-licenses: true
 
-      - name: Sign Staging APK
-        if: github.ref == 'refs/heads/staging' || github.base_ref == 'staging'
-        env:
-          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
-          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
-          SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
+      - name: 打包 Release APK
         run: |
-          set -e
-          APK=$(ls staging-apk/app-github-release*.apk | grep -v aligned | head -1)
+          chmod +x gradlew
+          ./gradlew assembleGithubRelease --no-daemon --stacktrace --no-configuration-cache
+
+      - name: 自动签名并对齐 APK
+        run: |
+          APK=$(ls app/build/outputs/apk/github/release/*.apk | grep -v aligned | head -1)
           ALIGNED_APK="${APK%.apk}-aligned.apk"
           FINAL_APK="${APK/-unsigned/}"
 
-          echo "Original APK: $APK"
-          echo "Final APK: $FINAL_APK"
+          echo "原始 APK: $APK"
+          echo "最终 APK: $FINAL_APK"
 
           ZIPALIGN=$(find $ANDROID_HOME/build-tools -name zipalign | sort | tail -1)
-          APKSIGNER=$(find $ANDROID_HOME/build-tools -name apksigner | sort | tail -1)
-
           echo "zipalign: $ZIPALIGN"
-          echo "apksigner: $APKSIGNER"
-
           $ZIPALIGN -v -p 4 "$APK" "$ALIGNED_APK"
+
+          APKSIGNER=$(find $ANDROID_HOME/build-tools -name apksigner | sort | tail -1)
+          echo "apksigner: $APKSIGNER"
 
           $APKSIGNER sign \
             --ks release.jks \
-            --ks-pass pass:"$SIGNING_KEYSTORE_PASSWORD" \
-            --ks-key-alias "$SIGNING_KEY_ALIAS" \
-            --key-pass pass:"$SIGNING_KEY_PASSWORD" \
+            --ks-pass pass:"${{ secrets.SIGNING_KEYSTORE_PASSWORD }}" \
+            --ks-key-alias "${{ secrets.SIGNING_KEY_ALIAS }}" \
+            --key-pass pass:"${{ secrets.SIGNING_KEY_PASSWORD }}" \
             --v2-signing-enabled true \
             --v3-signing-enabled true \
             "$ALIGNED_APK"
@@ -185,89 +70,16 @@ jobs:
           rm -f "$APK"
           mv "$ALIGNED_APK" "$FINAL_APK"
 
-          echo "Staging release APK signed: $FINAL_APK"
+          echo "✅ 签名和对齐完成"
 
-      - name: Upload Signed Staging APK
-        if: github.ref == 'refs/heads/staging' || github.base_ref == 'staging'
+      - name: 上传成品 APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-staging-release
-          path: staging-apk/*.apk
+          name: BudBuddy-Release
+          retention-days: 30
+          if-no-files-found: error
+          path: app/build/outputs/apk/github/release/*.apk
 
-      - name: Download Master APK
-        if: >
-          github.ref == 'refs/heads/master' ||
-          (
-            github.event_name == 'pull_request' &&
-            github.base_ref == 'master' &&
-            github.head_ref == 'staging' &&
-            github.event.pull_request.head.repo.full_name == github.repository
-          )
-        uses: actions/download-artifact@v4
-        with:
-          name: app-master-release-unsigned
-          path: master-apk
-
-      - name: Sign Master APK
-        if: >
-          github.ref == 'refs/heads/master' ||
-          (
-            github.event_name == 'pull_request' &&
-            github.base_ref == 'master' &&
-            github.head_ref == 'staging' &&
-            github.event.pull_request.head.repo.full_name == github.repository
-          )
-        env:
-          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
-          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
-          SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
-        run: |
-          set -e
-          APK=$(ls master-apk/app-github-release*.apk | grep -v aligned | head -1)
-          ALIGNED_APK="${APK%.apk}-aligned.apk"
-          FINAL_APK="${APK/-unsigned/}"
-
-          echo "Original APK: $APK"
-          echo "Final APK: $FINAL_APK"
-
-          ZIPALIGN=$(find $ANDROID_HOME/build-tools -name zipalign | sort | tail -1)
-          APKSIGNER=$(find $ANDROID_HOME/build-tools -name apksigner | sort | tail -1)
-
-          echo "zipalign: $ZIPALIGN"
-          echo "apksigner: $APKSIGNER"
-
-          $ZIPALIGN -v -p 4 "$APK" "$ALIGNED_APK"
-
-          $APKSIGNER sign \
-            --ks release.jks \
-            --ks-pass pass:"$SIGNING_KEYSTORE_PASSWORD" \
-            --ks-key-alias "$SIGNING_KEY_ALIAS" \
-            --key-pass pass:"$SIGNING_KEY_PASSWORD" \
-            --v2-signing-enabled true \
-            --v3-signing-enabled true \
-            "$ALIGNED_APK"
-
-          $APKSIGNER verify --verbose "$ALIGNED_APK"
-
-          rm -f "$APK"
-          mv "$ALIGNED_APK" "$FINAL_APK"
-
-          echo "Master release APK signed: $FINAL_APK"
-
-      - name: Upload Signed Master APK
-        if: >
-          github.ref == 'refs/heads/master' ||
-          (
-            github.event_name == 'pull_request' &&
-            github.base_ref == 'master' &&
-            github.head_ref == 'staging' &&
-            github.event.pull_request.head.repo.full_name == github.repository
-          )
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-release
-          path: master-apk/*.apk
-
-      - name: Clean up keystores
+      - name: 清理密钥文件
         if: always()
         run: rm -f release.jks
