@@ -66,7 +66,6 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # ================= Dev =================
       - name: Build Debug APK (Dev)
         if: github.ref == 'refs/heads/dev' || github.base_ref == 'dev'
         run: ./gradlew assembleGithubDebug
@@ -78,7 +77,6 @@ jobs:
           name: app-debug-dev
           path: app/build/outputs/apk/github/debug/app-github-debug.apk
 
-      # ================= Staging =================
       - name: Build Debug APK (Staging)
         if: github.ref == 'refs/heads/staging' || github.base_ref == 'staging'
         run: ./gradlew assembleGithubDebug
@@ -90,18 +88,67 @@ jobs:
           name: app-debug
           path: app/build/outputs/apk/github/debug/app-github-debug.apk
 
+      - name: Build Unsigned Release APK (Staging)
+        if: github.ref == 'refs/heads/staging' || github.base_ref == 'staging'
+        run: ./gradlew assembleGithubRelease
+
+      - name: Upload Staging Release APK
+        if: github.ref == 'refs/heads/staging' || github.base_ref == 'staging'
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-staging-release-unsigned
+          path: app/build/outputs/apk/github/release/app-github-release*.apk
+
+      - name: Build Unsigned Release APK (Master)
+        if: >
+          github.ref == 'refs/heads/master' ||
+          (
+            github.event_name == 'pull_request' &&
+            github.base_ref == 'master' &&
+            github.head_ref == 'staging' &&
+            github.event.pull_request.head.repo.full_name == github.repository
+          )
+        run: ./gradlew assembleGithubRelease
+
+      - name: Upload Master Release APK
+        if: >
+          github.ref == 'refs/heads/master' ||
+          (
+            github.event_name == 'pull_request' &&
+            github.base_ref == 'master' &&
+            github.head_ref == 'staging' &&
+            github.event.pull_request.head.repo.full_name == github.repository
+          )
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-master-release-unsigned
+          path: app/build/outputs/apk/github/release/app-github-release*.apk
+
+  sign:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up JDK 11
+        uses: actions/setup-java@v5
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
       - name: Restore signing keystore
-        if: github.ref == 'refs/heads/staging' || github.base_ref == 'staging' || github.ref == 'refs/heads/master' || (github.event_name == 'pull_request' && github.base_ref == 'master' && github.head_ref == 'staging' && github.event.pull_request.head.repo.full_name == github.repository)
         env:
           SIGNING_KEYSTORE: ${{ secrets.SIGNING_KEYSTORE }}
         run: |
           echo "$SIGNING_KEYSTORE" | base64 -d > release.jks
 
-      - name: Build Unsigned Release APK (Staging)
+      - name: Download Staging APK
         if: github.ref == 'refs/heads/staging' || github.base_ref == 'staging'
-        run: ./gradlew assembleGithubRelease
+        uses: actions/download-artifact@v4
+        with:
+          name: app-staging-release-unsigned
+          path: staging-apk
 
-      - name: Sign Release APK (Staging)
+      - name: Sign Staging APK
         if: github.ref == 'refs/heads/staging' || github.base_ref == 'staging'
         env:
           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
@@ -109,15 +156,7 @@ jobs:
           SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
         run: |
           set -e
-
-          # 签名阶段切换 JDK 11，避免旧 keystore 无法解析
-          if [[ -n "$JAVA_HOME_11_X64" ]]; then
-            export JAVA_HOME="$JAVA_HOME_11_X64"
-            export PATH="$JAVA_HOME/bin:$PATH"
-            echo "Using JDK 11 for signing"
-          fi
-
-          APK=$(ls app/build/outputs/apk/github/release/app-github-release*.apk | grep -v aligned | head -1)
+          APK=$(ls staging-apk/app-github-release*.apk | grep -v aligned | head -1)
           ALIGNED_APK="${APK%.apk}-aligned.apk"
           FINAL_APK="${APK/-unsigned/}"
 
@@ -148,15 +187,14 @@ jobs:
 
           echo "Staging release APK signed: $FINAL_APK"
 
-      - name: Upload Staging Release APK
+      - name: Upload Signed Staging APK
         if: github.ref == 'refs/heads/staging' || github.base_ref == 'staging'
         uses: actions/upload-artifact@v4
         with:
           name: app-staging-release
-          path: app/build/outputs/apk/github/release/app-github-release*.apk
+          path: staging-apk/*.apk
 
-      # ================= Master =================
-      - name: Build Unsigned Release APK (Master)
+      - name: Download Master APK
         if: >
           github.ref == 'refs/heads/master' ||
           (
@@ -165,9 +203,12 @@ jobs:
             github.head_ref == 'staging' &&
             github.event.pull_request.head.repo.full_name == github.repository
           )
-        run: ./gradlew assembleGithubRelease
+        uses: actions/download-artifact@v4
+        with:
+          name: app-master-release-unsigned
+          path: master-apk
 
-      - name: Sign Release APK (Master)
+      - name: Sign Master APK
         if: >
           github.ref == 'refs/heads/master' ||
           (
@@ -182,15 +223,7 @@ jobs:
           SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
         run: |
           set -e
-
-          # 签名阶段切换 JDK 11，避免旧 keystore 无法解析
-          if [[ -n "$JAVA_HOME_11_X64" ]]; then
-            export JAVA_HOME="$JAVA_HOME_11_X64"
-            export PATH="$JAVA_HOME/bin:$PATH"
-            echo "Using JDK 11 for signing"
-          fi
-
-          APK=$(ls app/build/outputs/apk/github/release/app-github-release*.apk | grep -v aligned | head -1)
+          APK=$(ls master-apk/app-github-release*.apk | grep -v aligned | head -1)
           ALIGNED_APK="${APK%.apk}-aligned.apk"
           FINAL_APK="${APK/-unsigned/}"
 
@@ -221,7 +254,7 @@ jobs:
 
           echo "Master release APK signed: $FINAL_APK"
 
-      - name: Upload Release APK
+      - name: Upload Signed Master APK
         if: >
           github.ref == 'refs/heads/master' ||
           (
@@ -233,7 +266,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-release
-          path: app/build/outputs/apk/github/release/app-github-release*.apk
+          path: master-apk/*.apk
 
       - name: Clean up keystores
         if: always()
