@@ -16,7 +16,6 @@ android {
         versionName = "1.7.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        resourceConfigurations += listOf("en", "tr", "az", "ru", "zh-rCN")
     }
 
     bundle {
