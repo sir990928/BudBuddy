@@ -1013,7 +1013,7 @@ fun AppSettingsScreen(
                                         selectedLang = code
                                         prefs.edit().putString("AppLanguage", code).apply()
                                         showLanguageDialog = false
-                                        (context as? Activity)?.recreate()
+                                        (context as? android.app.Activity)?.recreate()
                                     }
                                 }
                                 .padding(horizontal = 12.dp, vertical = 10.dp)
@@ -1026,7 +1026,7 @@ fun AppSettingsScreen(
                                         selectedLang = code
                                         prefs.edit().putString("AppLanguage", code).apply()
                                         showLanguageDialog = false
-                                        (context as? Activity)?.recreate()
+                                        (context as? android.app.Activity)?.recreate()
                                     }
                                 }
                             )
